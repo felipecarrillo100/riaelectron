@@ -1,4 +1,8 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+.idea
+
+#license
+public/luciad/license/*.txt
 
 # dependencies
 /node_modules
@@ -10,6 +14,7 @@
 
 # production
 /build
+/electronapp-win32-x64
 
 # misc
 .DS_Store
