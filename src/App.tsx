@@ -3,6 +3,7 @@ import './App.css';
 import {LuciadMap} from "./components/luciad/LuciadMap";
 
 function App() {
+  const nodeVersion = (window as any).version.electron();
   return (
     <div className="App">
       <header className="App-header">
@@ -19,7 +20,7 @@ function App() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Learn React
+          The Node version is: {nodeVersion}
         </a>
       </header>
     </div>
