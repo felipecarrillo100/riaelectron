@@ -1,12 +1,47 @@
 const path = require('path');
 
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, ipcMain, Menu} = require('electron');
 
+let mainWindow = null;
 function isDevelopment() {
     return process.argv[2] == '--dev';
 }
 
 const isDev = isDevelopment();
+
+const menu = [
+    {
+        label: "File",
+        submenu: [
+            {
+                label: "Quit",
+                click: ()=> app.quit(),
+                accelerator: "CmdOrCtrl+Q"
+            }
+        ]
+    },
+    {
+        label: "Help",
+        submenu: [
+            {
+                label: "Red",
+                click: ()=>notify("red"),
+                accelerator: "CmdOrCtrl+R"
+            },
+            {
+                label: "Blue",
+                click: ()=>notify("blue"),
+                accelerator: "CmdOrCtrl+B"
+            },
+            {
+                label: "About",
+                click: about,
+                accelerator: "CmdOrCtrl+A"
+            }
+        ]
+    }
+]
+
 
 function createWindow() {
     // Create the browser window.
@@ -19,10 +54,14 @@ function createWindow() {
             preload: path.join(__dirname, "./preload.js")
         },
     });
+    mainWindow = win;
 
     // and load the index.html of the app.
     // win.loadFile("index.html");
     // win.webContents.openDevTools()
+
+    const mainMenu = Menu.buildFromTemplate(menu);
+    Menu.setApplicationMenu(mainMenu);
 
     win.loadURL(
         isDev
@@ -54,3 +93,28 @@ app.on('activate', () => {
         createWindow();
     }
 });
+
+ipcMain.on("canal5", (e, options)=>{
+    console.log(JSON.stringify(options));
+})
+
+function about() {
+    if (!mainWindow) return;
+    const aboutWindow = new BrowserWindow({
+        parent: mainWindow,
+        modal: true,
+        title: "About",
+        width:  320,
+        height: 320,
+    });
+
+    aboutWindow.loadFile(path.join(__dirname, "./renderer/about.html"));
+}
+
+
+function notify(color) {
+    if (!mainWindow) return;
+    mainWindow.webContents.send("canal5", {
+        color: color
+    })
+}
