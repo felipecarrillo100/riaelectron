@@ -1,8 +1,9 @@
 const path = require('path');
 
-const { app, BrowserWindow, ipcMain, Menu} = require('electron');
+const { app, BrowserWindow, ipcMain, Menu, screen} = require('electron');
 
 let mainWindow = null;
+let myLoginWindow = null;
 function isDevelopment() {
     return process.argv[2] == '--dev';
 }
@@ -18,6 +19,21 @@ const menu = [
                 click: ()=> app.quit(),
                 accelerator: "CmdOrCtrl+Q"
             }
+        ]
+    },
+    {
+        label: "HxDR",
+        submenu: [
+            {
+                label: "Login",
+                click: ()=> loginWindow(),
+                accelerator: "CmdOrCtrl+L"
+            },
+            {
+                label: "Logout",
+                click: ()=> logout(),
+                accelerator: "CmdOrCtrl+O"
+            },
         ]
     },
     {
@@ -45,9 +61,11 @@ const menu = [
 
 function createWindow() {
     // Create the browser window.
+    const { width, height } = screen.getPrimaryDisplay().workAreaSize
+
     const win = new BrowserWindow({
-        width: 1024,
-        height: 720,
+        width,
+        height,
         webPreferences: {
             contextIsolation: true,
             nodeIntegration: true,
@@ -98,6 +116,17 @@ ipcMain.on("canal5", (e, options)=>{
     console.log(JSON.stringify(options));
 })
 
+ipcMain.on("hxdr", (e, options)=>{
+    switch (options.type) {
+        case "closeWindow":
+            console.log(`refreshToken: ${options.refreshToken}`);
+            console.log(`accessToken: ${options.accessToken}`);
+            const win = BrowserWindow.getFocusedWindow();
+            win.close();
+            break;
+    }
+})
+
 function about() {
     if (!mainWindow) return;
     const aboutWindow = new BrowserWindow({
@@ -108,13 +137,46 @@ function about() {
         height: 320,
     });
 
+    aboutWindow.setMenu(null);
+
     aboutWindow.loadURL(
         isDev
-            ? 'http://localhost:3000/about'
+            ? 'http://localhost:3000/#about'
             : `file://${path.join(__dirname, '../build/index.html#about')}`
     );
 }
 
+function loginWindow() {
+    if (!mainWindow) return;
+    myLoginWindow = new BrowserWindow({
+        parent: mainWindow,
+        modal: true,
+        title: "Logout",
+        width:  480,
+        height: 580,
+        webPreferences: {
+            contextIsolation: true,
+            nodeIntegration: true,
+            preload: path.join(__dirname, "./preloadHxDR.js")
+        },
+    });
+
+  //  myLoginWindow.webContents.session.clearCache().then(()=>{});
+  //  myLoginWindow.webContents.openDevTools({ mode: 'detach' });
+
+    myLoginWindow.setMenu(null);
+
+
+    myLoginWindow.loadURL(
+        isDev
+            ? 'http://localhost:3600'
+            : `https://demo.luciad.com/hxdr-remote-auth/`
+    );
+}
+
+function logout() {
+
+}
 
 function notify(color) {
     if (!mainWindow) return;
@@ -122,3 +184,13 @@ function notify(color) {
         color: color
     })
 }
+
+const staticC = require('node-static');
+const file = new staticC.Server(`${__dirname}/../static`)
+const http = require('http')
+
+http.createServer(function (request, response) {
+    request.addListener('end', function () {
+        file.serve(request, response)
+    }).resume()
+}).listen(3600);

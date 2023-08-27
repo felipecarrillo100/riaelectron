@@ -4,6 +4,9 @@
 #license
 public/luciad/license/*.txt
 
+#remove hxdr clientid, you need to add your own
+static/hxdr.js
+
 # dependencies
 /node_modules
 /.pnp
