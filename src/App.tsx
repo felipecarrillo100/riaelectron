@@ -6,7 +6,7 @@ import {electronBridge} from "./electronbridge/Bridge";
 
 function App() {
   useEffect(() => {
-    electronBridge.ipcRenderer.on("canal5", handleOptions)
+    electronBridge.ipcRenderer?.on("canal5", handleOptions)
     return () => {
       // unsubscribe event
     };
@@ -20,7 +20,7 @@ function App() {
   }
 
   const message = () =>{
-    electronBridge.ipcRenderer.send("canal5", {hello:"there", n: 23})
+    electronBridge.ipcRenderer?.send("canal5", {hello:"there", n: 23})
   }
 
   return (
@@ -39,7 +39,7 @@ function App() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          The Node version is abcd: {electronBridge.version.node()}
+          The Node version is abcd: {electronBridge.version?.node()}
         </a>
         <button onClick={message}>Send message to main</button>
       </header>

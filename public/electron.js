@@ -108,7 +108,11 @@ function about() {
         height: 320,
     });
 
-    aboutWindow.loadFile(path.join(__dirname, "./renderer/about.html"));
+    aboutWindow.loadURL(
+        isDev
+            ? 'http://localhost:3000/about'
+            : `file://${path.join(__dirname, '../build/index.html#about')}`
+    );
 }
 
 
