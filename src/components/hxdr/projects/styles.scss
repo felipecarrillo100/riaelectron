@@ -1,0 +1,273 @@
+$brand-primary: #006187 !default;
+$brand-success:         #62c462 !default;
+$brand-info:            #5bc0de !default;
+$brand-warning:         #f89406 !default;
+$brand-danger:          #ee5f5b !default;
+
+$text-color:            #C8C8C8 !default;
+$navbar-default-color:             $text-color !default;
+$navbar-default-link-color:                $text-color !default;
+$white:    #fff !default;
+$gray-100: #f8f9fa !default;
+$gray-200: #e9ecef !default;
+$gray-300: #dee2e6 !default;
+$gray-400: #ced4da !default;
+$gray-500: #999 !default;
+$gray-600: #7A8288 !default;
+$gray-700: #52575C !default;
+$gray-800: #3A3F44 !default;
+$gray-900: #272B30 !default;
+$black:    #000 !default;
+
+$body-bg:                   $gray-900 !default;
+$modal-content-bg:                  lighten($body-bg, 5%) !default;
+$gray-darker:            #272B30 !default; // #222
+$local-text-color: $gray-darker;
+
+.SlidingPanel-body {
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    text-align: left;
+    padding: 10px;
+    background-color: #2E3748;
+    background-color: $modal-content-bg;
+    color: $text-color;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+
+.form-group {
+//        background-color: $modal-content-bg;
+    background-color: transparent;
+    margin-bottom: 10px;
+}
+
+hr {
+    margin-top: 12px;
+    margin-bottom: 12px;
+    border-color: black;
+}
+
+.nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus {
+    background-color: $gray-600;
+}
+@media (min-width: 768px) {
+    .form-horizontal .control-label {
+        text-align: left;
+    }
+}
+
+/** Style Select / AsyncSelect */
+.select__option, .async-select__option {
+    color: $local-text-color;
+}
+.select-container, async-select-container {
+    border-radius: 5px;
+// z-index: 3;
+    height: 30px;
+    max-height: 30px;
+}
+.select__value-container, .async-select__value-container {
+    border-radius: 5px;
+    z-index: 3;
+}
+.select__control, .async-select__control {
+    border-radius: 5px;
+    height: 30px;
+    min-height: 30px;
+    max-height: 30px;
+}
+.input-group > .form-control:not(:last-child) {
+.async-select__control{
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+}
+
+.select__indicator, .async-select__indicator  {
+    padding: 4px;
+}
+
+.select__control, .async-select__control {
+    border-radius: 4px;
+    height: 30px;
+    min-height: 30px;
+    max-height: 30px;
+}
+
+.select__control--is-focused, .async-select__control--is-focused {
+    border-radius: 4px;
+    border-color: $brand-primary;
+    box-shadow: 0 0 0 1px $brand-primary;
+    height: 30px;
+    min-height: 30px;
+    max-height: 30px;
+}
+
+.select__placeholder, .async-select__placeholder {
+    color: $text-color;
+}
+
+.select__control--is-focused:hover, .async-select__control--is-focused:hover {
+    border-color: lighten($brand-primary, 5%);
+    box-shadow: 0 0 0 1px $brand-primary;
+    color: $navbar-default-color;
+    color: white;
+}
+}
+
+.SlidingPanel-body > .form-horizontal .form-group {
+    margin-right: 0px;
+    margin-left: 0px;
+}
+
+@media only screen and (max-width: 400px) {
+    .SlidingPanel > div.SlidingPanel-window {
+        max-width: unset;
+        width: 100%;
+    }
+}
+
+.SlidingPanel-body .col-sm-12 {
+    padding-top: 0px;
+//  text-align: left;  //  FIX for RTL
+}
+
+.SlidingPanel-body .table > thead > tr > th {
+    vertical-align: bottom;
+    border-bottom: 1px solid #f1f1f1;
+}
+
+.SlidingPanel-body .table > tfoot > tr > th, .table > tfoot > tr > td {
+    padding: 6px;
+    line-height: 1.42857;
+    vertical-align: top;
+    border-bottom: 1px solid #f1f1f1;
+}
+
+.SlidingPanel-body .table > thead > tr > th, .table > thead > tr > td, .table > tbody > tr > th, .table > tbody > tr > td, .table > tfoot > tr > th, .table > tfoot > tr > td {
+    padding: 6px;
+    line-height: 1.42857;
+    vertical-align: top;
+    border-bottom: 1px solid #f1f1f1;
+}
+
+.SlidingPanel-body .tab-content {
+    padding-top: 10px;
+}
+
+.SlidingPanel-body .nav-tabs {
+    border-bottom: 1px solid #999999;
+}
+
+/*
+.pagination > .disabled > span, .pagination > .disabled > span:hover, .pagination > .disabled > span:focus, .pagination > .disabled > a, .pagination > .disabled > a:hover, .pagination > .disabled > a:focus {
+    color: #595d63;
+    background-color: inherit;
+    border-color: transparent;
+    cursor: not-allowed;
+}
+*/
+.SlidingPanel-body .nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus {
+    background-color: $modal-content-bg;
+    padding-top: 6px;
+    padding-bottom: 6px;
+}
+
+.SlidingPanel-body .nav-tabs > li > a {
+    padding-top: 6px;
+    padding-bottom: 6px;
+}
+
+.select__menu, .SlidingPanel-body .select__menu,
+.async-select__menu, .SlidingPanel-body .async-select__menu {
+    margin-top: 0!important;
+    z-index: 4;
+.select__option--is-focused, .async-select__option--is-focused,
+.select__option--is-selected, .async-select__option--is-selected {
+    background-color: lighten($brand-primary, 5%);
+    color: $navbar-default-color;
+    color: white;
+}
+}
+
+
+/*************************************/
+$line-height-value: 24px;
+
+.HxDRProjectsTab {
+    .pagination {
+        margin: 0 0 !important;
+        justify-content: center !important;
+        display: flex !important;
+        margin-top: 5px !important;
+    }
+
+    .thumbnail{
+        display: block;
+        border: 1px solid darkgray;
+        width: 100%;
+        height: auto;
+        min-height: 60px;
+        div {
+            width: 100%;
+            height: 100%;
+            line-height: 60px;
+            text-align: center;
+            vertical-align: center;
+        }
+    }
+
+    ul.pagination {
+        li.active {
+            a {
+                background-color: #006187;
+                background-image: linear-gradient(#007eb0, #006187 60%, #005273);
+            }
+        }
+    }
+
+    .ttable {
+        color: $text-color;
+        border: 1px solid darkgray;
+        .theader {
+            background-color: $brand-primary;
+            border-bottom: 1px solid darkgray;
+            .row {
+                max-width: 100%;
+                margin-left: 1px;
+                margin-right: 1px;
+                padding-left: 0px;
+                padding-right: 0px;
+                min-height: $line-height-value;
+                line-height: $line-height-value;
+            }
+        }
+        .ebody{
+            text-align: center;
+        }
+        .tbody {
+            .row {
+                max-width: 100%;
+                margin-left: 1px;
+                margin-right: 1px;
+                padding-left: 0px;
+                padding-right: 0px;
+                min-height: $line-height-value;
+                line-height: $line-height-value;
+                &:hover{
+                    background-color: lighten($brand-primary, 20%);
+                    color: $text-color;
+                }
+                .title-flex {
+                    white-space: nowrap;
+                    max-width: 240px;
+                    overflow-x: hidden;
+                }
+            }
+            .row.selected {
+                background-color: lighten($brand-primary, 10%);
+            }
+        }
+    }
+}

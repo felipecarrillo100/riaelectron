@@ -8,5 +8,8 @@ export const electronBridge = {
     ipcRenderer: bridge.ipcRenderer as {
         send: (channel: string, data: any)=>void;
         on: (channel: string, func: (o:any)=>void) => void,
-    }
+    },
+    hxdrServer: bridge.hxdrServer as {
+        getUrl: ()=>string;
+    },
 }

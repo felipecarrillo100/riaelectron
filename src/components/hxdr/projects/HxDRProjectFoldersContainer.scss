@@ -1,0 +1,63 @@
+ @import './variables';
+
+.HxDRProjectFoldersContainer {
+  .folder {
+    cursor: pointer;
+    &:hover {
+      background-color: $hover-bg-color;
+    }
+  }
+  .asset {
+    cursor: pointer;
+    &:hover {
+      background-color: $hover-bg-color;
+    }
+  }
+  .asset.active {
+    background-color: lighten($brand-primary, 10%);
+  }
+  .icon-wrapper {
+    min-width: 20px;
+    width: 20px;
+    margin-left: 6px;
+    margin-right: 4px;
+  }
+  div.main-container {
+    width: 100%;
+    padding: 0;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    background-color: black;
+    border: 1px solid darkgray;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    padding: 0px;
+    background-color: $modal-content-bg;
+    a {
+      color: $navbar-default-link-color;
+    }
+    .body-ul {
+      width: 1024px;
+      display: inline-block;
+    }
+    ul {
+      margin-top: 2px;
+      margin-bottom: 2px;
+      padding-left: 0px;
+      list-style: none;
+      li {
+        ul {
+          padding-left: 8px;
+        }
+      }
+    }
+    .thumb-horizontal {
+      background-color: rgba(255, 255, 255, 0.25);
+    }
+
+    .thumb-vertical{
+      background-color: rgba(255, 255, 255, 0.25);
+    }
+  }
+}

@@ -1,4 +1,28 @@
-.LuciadMap  {
+.LuciadMap {
     width: 100%;
     height: 100%;
+    background-color: black;
+    text-align: center;
 }
+
+.LeftControls {
+    z-index: 1;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    bottom: 0px;
+    width: 415px;
+    pointer-events: none;
+}
+
+.CenterButtons {
+    z-index: 1;
+    position: absolute;
+    top: 10px;
+    left: 0;
+    right: 0;
+    margin-left: auto;
+    margin-right: auto;
+    pointer-events: none;
+}
+
