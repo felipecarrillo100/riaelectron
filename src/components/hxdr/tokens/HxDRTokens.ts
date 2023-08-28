@@ -8,10 +8,18 @@ export function getHxDRRefreshToken() {
     return window.sessionStorage.getItem(refreshToken);
 }
 
-export function setHxDRAccessToken(token: string) {
-    return window.sessionStorage.setItem(accessToken, token);
+export function setHxDRAccessToken(token: string | null) {
+    if (!token) {
+        window.sessionStorage.removeItem(accessToken)
+    } else {
+        return window.sessionStorage.setItem(accessToken, token);
+    }
 }
 
-export function setHxDRRefreshToken(token:string) {
-    return window.sessionStorage.setItem(refreshToken, token);
+export function setHxDRRefreshToken(token:string | null) {
+    if (!token) {
+        window.sessionStorage.removeItem(refreshToken)
+    } else {
+        return window.sessionStorage.setItem(refreshToken, token);
+    }
 }

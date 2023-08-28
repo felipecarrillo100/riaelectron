@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useRef, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import "./LuciadMap.css"
 import {WebGLMap} from "@luciad/ria/view/WebGLMap";
 import {getReference} from "@luciad/ria/reference/ReferenceProvider";
