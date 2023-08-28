@@ -1,6 +1,9 @@
 const path = require('path');
 
-const { app, BrowserWindow, ipcMain, Menu, screen} = require('electron');
+const { app, BrowserWindow, ipcMain, Menu, screen, dialog} = require('electron');
+
+const staticC = require("node-static");
+const http = require("http");
 
 let mainWindow = null;
 let myLoginWindow = null;
@@ -15,6 +18,13 @@ const menu = [
         label: "File",
         submenu: [
             {
+                id: "disk-id",
+                label: "Select asset Files",
+                click: ()=> selectFolder(),
+                accelerator: "CmdOrCtrl+F",
+                enabled: true
+            },
+            {
                 label: "Quit",
                 click: ()=> app.quit(),
                 accelerator: "CmdOrCtrl+Q"
@@ -25,14 +35,18 @@ const menu = [
         label: "HxDR",
         submenu: [
             {
+                id: "login-id",
                 label: "Login",
                 click: ()=> loginWindow(),
-                accelerator: "CmdOrCtrl+L"
+                accelerator: "CmdOrCtrl+L",
+                enabled: true
             },
             {
+                id: "logout-id",
                 label: "Logout",
                 click: ()=> logout(),
-                accelerator: "CmdOrCtrl+O"
+                accelerator: "CmdOrCtrl+O",
+                enabled: false
             },
         ]
     },
@@ -123,6 +137,13 @@ ipcMain.on("hxdr", (e, options)=>{
             console.log(`accessToken: ${options.accessToken}`);
             const win = BrowserWindow.getFocusedWindow();
             win.close();
+            Menu.getApplicationMenu().getMenuItemById('login-id').enabled = false;
+            Menu.getApplicationMenu().getMenuItemById('logout-id').enabled = true;
+
+            mainWindow.webContents.send("hxdr-token", {
+                refreshToken: options.refreshToken,
+                accessToken: options.accessToken
+            });
             break;
     }
 })
@@ -133,8 +154,8 @@ function about() {
         parent: mainWindow,
         modal: true,
         title: "About",
-        width:  320,
-        height: 320,
+        width:  480,
+        height: 580,
     });
 
     aboutWindow.setMenu(null);
@@ -146,6 +167,27 @@ function about() {
     );
 }
 
+function selectFolder() {
+    const path = dialog.showOpenDialog({
+        properties: [
+            'openFile',
+            'multiSelections',
+        ],
+        filters: [
+            { name: 'Wavefront Obj', extensions: ['jpg', 'png', 'mtl', 'obj', 'prj'] },
+            { name: 'E57', extensions: ['e57', 'prj'] },
+            { name: 'All Files', extensions: ['*'] }
+        ]
+    });
+    path.then((result)=>{
+        if (result.canceled===false) {
+            console.log(JSON.stringify(result, null,2));
+        } else {
+            console.log("Cancelled")
+        }
+    })
+
+}
 function loginWindow() {
     if (!mainWindow) return;
     myLoginWindow = new BrowserWindow({
@@ -175,7 +217,12 @@ function loginWindow() {
 }
 
 function logout() {
-
+    Menu.getApplicationMenu().getMenuItemById('login-id').enabled = true;
+    Menu.getApplicationMenu().getMenuItemById('logout-id').enabled = false;
+    mainWindow.webContents.send("hxdr-token", {
+        refreshToken: null,
+        accessToken: null
+    });
 }
 
 function notify(color) {
@@ -185,12 +232,15 @@ function notify(color) {
     })
 }
 
-const staticC = require('node-static');
-const file = new staticC.Server(`${__dirname}/../static`)
-const http = require('http')
+if (isDev) {
+    const staticC = require('node-static');
+    const file = new staticC.Server(`${__dirname}/../static`)
+    const http = require('http')
 
-http.createServer(function (request, response) {
-    request.addListener('end', function () {
-        file.serve(request, response)
-    }).resume()
-}).listen(3600);
+    http.createServer(function (request, response) {
+        request.addListener('end', function () {
+            file.serve(request, response)
+        }).resume()
+    }).listen(3600);
+}
+
