@@ -6,7 +6,6 @@ import {OGC3DTilesModel} from "@luciad/ria/model/tileset/OGC3DTilesModel";
 import {FeatureLayer} from "@luciad/ria/view/feature/FeatureLayer";
 import {FusionPanoramaModel} from "@luciad/ria/model/tileset/FusionPanoramaModel";
 import {FeatureModel} from "@luciad/ria/model/feature/FeatureModel";
-import {PanoramaFeaturePainter} from "../painters/PanoramaFeaturePainter";
 import {WebGLMap} from "@luciad/ria/view/WebGLMap";
 import {LayerTreeNode} from "@luciad/ria/view/LayerTreeNode";
 import {LayerTreeVisitor} from "@luciad/ria/view/LayerTreeVisitor";
@@ -19,6 +18,10 @@ import {Layer} from "@luciad/ria/view/Layer";
 import {getReference} from "@luciad/ria/reference/ReferenceProvider";
 import {createBounds} from "@luciad/ria/shape/ShapeFactory";
 import {Bounds} from "@luciad/ria/shape/Bounds";
+import {LayerGroup} from "@luciad/ria/view/LayerGroup";
+import {PanoramaFeaturePainter} from "../painters/PanoramaFeaturePainter";
+import {UrlTileSetModel} from "@luciad/ria/model/tileset/UrlTileSetModel";
+import {FusionTileSetModel} from "@luciad/ria/model/tileset/FusionTileSetModel";
 
 class LayerFactory {
     public static createBingmapsLayer(bingModel:BingMapsTileSetModel, command: any) {
@@ -61,6 +64,22 @@ class LayerFactory {
         });
     }
 
+  static async createLayerGroup(layerOptions: any) {
+    let options = {...layerOptions};
+    return new Promise<LayerGroup>((resolve, reject) => {
+      if (typeof options === "undefined") {
+        options = {};
+      }
+      options.label = options.label ? options.label : "New group";
+      const layer = new LayerGroup(options);
+      if (layer) {
+        resolve(layer)
+      } else {
+        reject();
+      }
+    });
+  }
+
     static async createHSPCLayer(model: HSPCTilesModel, layerOptions: any) {
         let options = {...layerOptions};
 
@@ -85,60 +104,6 @@ class LayerFactory {
         });
     }
 
-    public static createPanoramicsLayer(model: FeatureModel, layerOptions: any, modelOptions: any) {
-        let options = {...layerOptions};
-        return new Promise<FeatureLayer>((resolve, reject)=>{
-            if (typeof options === "undefined") {
-                options = {}
-            }
-            const target =  modelOptions.url;
-            const panoModel = new FusionPanoramaModel(target, {
-                credentials: modelOptions.credentials,
-                requestHeaders: modelOptions.requestHeaders
-            });
-
-            const layer = new FeatureLayer(model, {
-                ...options,
-                panoramaModel: panoModel,
-                selectable: false,
-                painter:new PanoramaFeaturePainter({
-                    overview: false,
-                    iconHeightOffset: Number(options.iconHeightOffset) // sensor height in meters above street level (approx)
-                })
-            });
-            if (layer) {
-                resolve(layer);
-            } else {
-                reject();
-            }
-        })
-    }
-
-
-    static isFusionPanoramaLayer(layer: any) {
-        return layer instanceof FeatureLayer && layer.panoramaModel && layer.painter instanceof PanoramaFeaturePainter;
-    }
-    static findFusionPanoramaLayers(map: WebGLMap) {
-        const layers: FeatureLayer[] = [];
-        if (map && map.layerTree) {
-            const layerTreeVisitor = {
-                visitLayer: (layer: any) => {
-                    if (layer instanceof FeatureLayer && layer.panoramaModel && layer.painter instanceof PanoramaFeaturePainter) {
-                        layers.push(layer);
-                    }
-                    return LayerTreeVisitor.ReturnValue.CONTINUE;
-                },
-                visitLayerGroup: (layerGroup: any) => {
-                    layerGroup.visitChildren(layerTreeVisitor, LayerTreeNode.VisitOrder.TOP_DOWN);
-                    return LayerTreeVisitor.ReturnValue.CONTINUE;
-                }
-            };
-            map.layerTree.visitChildren(layerTreeVisitor, LayerTreeNode.VisitOrder.TOP_DOWN);
-        }
-        return layers;
-    }
-
-
     static async createWMSLayer(model: WMSTileSetModel, layerOptions: any) {
         return new Promise<WMSTileSetLayer>((resolve)=>{
             const layer = new WMSTileSetLayer(model, layerOptions)
@@ -146,10 +111,45 @@ class LayerFactory {
         })
     }
 
+  static async createTMSLayer(tmsModel: UrlTileSetModel, layerOptions: any) {
+    let options = {...layerOptions};
+    return new Promise<RasterTileSetLayer>((resolve, reject) => {
+      if (typeof options === "undefined") {
+        options = {}
+      }
+      options.label = options.label ? options.label : "TMS layer";
+      options.layerType = options.layerType ? options.layerType : LayerType.STATIC;
+
+      const layer = new RasterTileSetLayer(tmsModel, options);
+      if (layer) {
+        resolve(layer);
+      } else {
+        reject();
+      }
+    });
+  }
+
+  static async  createLTSLayer(elevationModel: FusionTileSetModel, layerOptions: any) {
+    let options = {...layerOptions};
+    return new Promise<RasterTileSetLayer>((resolve, reject) => {
+      if (typeof options === "undefined") {
+        options = {};
+      }
+      options.label = options.label ? options.label : "Elevation";
+      options.layerType = options.layerType ? options.layerType : LayerType.STATIC;
+      const layer = new RasterTileSetLayer(elevationModel, options);
+      if (layer) {
+        resolve(layer)
+      } else {
+        reject();
+      }
+    });
+  }
+
     static async getLayerBounds(aLayer: Layer) {
         return new Promise<Bounds> ((resolve, reject) => {
             const layer = aLayer as any;
-            if (typeof layer.restoreCommand !== "undefined") {
+            if (typeof layer.restoreCommand !== "undefined" && layer.restoreCommand.fitBounds) {
                 const fitBounds = layer.restoreCommand.fitBounds;
                 const ref = getReference(layer.restoreCommand.fitBounds.reference);
                 const coordinates = fitBounds.coordinates;
@@ -157,6 +157,10 @@ class LayerFactory {
                 resolve(bounds);
             } else {
                 if (layer instanceof  FeatureLayer) {
+                    if (layer.bounds) {
+                      resolve(layer.bounds);
+                      return;
+                    }
                     const queryFinishedHandle = layer.workingSet.on("QueryFinished", () => {
                         if (layer.bounds) {
                             resolve(layer.bounds);
@@ -171,6 +175,82 @@ class LayerFactory {
             }
         } )
     }
+
+  static async createWFSLayer(model: FeatureModel, layerOptions: any) {
+    return new Promise<FeatureLayer>((resolve)=>{
+      const layer = new FeatureLayer(model, layerOptions);
+      resolve(layer);
+    })
+  }
+
+  static async createEditableFeatureLayer(model: FeatureModel, layerOptions: any) {
+    let options = {...layerOptions};
+    return new Promise<FeatureLayer>((resolve, reject)=> {
+      if (typeof options !== "undefined") {
+        const layer = new FeatureLayer(model, options);
+        if (layer) {
+          resolve(layer)
+        } else {
+          reject();
+        }
+      } else {
+        reject()
+      }
+    })
+  }
+
+  static async createPanoramicsLayer(model: FeatureModel, layerOptions: any, modelOptions: any) {
+    let options = {...layerOptions};
+    return new Promise<FeatureLayer>((resolve, reject)=>{
+      if (typeof options === "undefined") {
+        options = {}
+      }
+      const target =  modelOptions.url;
+      const panoModel = new FusionPanoramaModel(target, {
+        credentials: modelOptions.credentials,
+        requestHeaders: modelOptions.requestHeaders
+      });
+
+      const layer = new FeatureLayer(model, {
+        ...options,
+        panoramaModel: panoModel,
+        selectable: false,
+        painter:new PanoramaFeaturePainter({
+          overview: false,
+          iconHeightOffset: Number(options.iconHeightOffset) // sensor height in meters above street level (approx)
+        })
+      });
+      if (layer) {
+        resolve(layer);
+      } else {
+        reject();
+      }
+    })
+  }
+
+  static isFusionPanoramaLayer(layer: any) {
+    return layer instanceof FeatureLayer && layer.panoramaModel && layer.painter instanceof PanoramaFeaturePainter;
+  }
+
+  static findFusionPanoramaLayers(map: WebGLMap) {
+    const layers: FeatureLayer[] = [];
+    if (map && map.layerTree) {
+      const layerTreeVisitor = {
+        visitLayer: (layer: any) => {
+          if (layer instanceof FeatureLayer && layer.panoramaModel && layer.painter instanceof PanoramaFeaturePainter) {
+            layers.push(layer);
+          }
+          return LayerTreeVisitor.ReturnValue.CONTINUE;
+        },
+        visitLayerGroup: (layerGroup: any) => {
+          layerGroup.visitChildren(layerTreeVisitor, LayerTreeNode.VisitOrder.TOP_DOWN);
+          return LayerTreeVisitor.ReturnValue.CONTINUE;
+        }
+      };
+      map.layerTree.visitChildren(layerTreeVisitor, LayerTreeNode.VisitOrder.TOP_DOWN);
+    }
+    return layers;
+  }
 }
 
 export {

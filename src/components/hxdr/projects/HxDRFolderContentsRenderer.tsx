@@ -1,9 +1,10 @@
 import React from "react";
 import {gql, useQuery} from "@apollo/client";
 import {HxDRAssetRenderer} from "./HxDRAssetRenderer";
-import {HxDRPAssetThumbnail, HxDRProjectAssetLayer} from "./HxDRProjectFoldersContainer";
+import {HxDRPAssetThumbnail} from "./HxDRProjectFoldersContainer";
 import {HxDRFolderRenderer} from "./HxDRFolderRenderer";
 import Glyphicon from "../../glyphicon/Glyphicon";
+import {LayerInfoHxDR} from "../utils/CreateHxDRLayerCommand";
 
 
 const GetFolderContents = gql`
@@ -261,10 +262,10 @@ fragment AssetTree on GroupedAssetOutput {
 interface Props {
     folderId: string;
     name: string;
-    onItemSelected(properties: HxDRProjectAssetLayer, index?: number): void;
-    onItemSelectedDoubleClick?(properties: HxDRProjectAssetLayer, index?: number): void;
+    onItemSelected(properties: LayerInfoHxDR, index?: number): void;
+    onItemSelectedDoubleClick?(properties: LayerInfoHxDR, index?: number): void;
     onSetThumbnail?(thumbnail: HxDRPAssetThumbnail): void;
-    currentLayer: HxDRProjectAssetLayer | null;
+    currentLayer: LayerInfoHxDR | null;
 }
 
 const HxDRFolderContentsRenderer: React.FC<Props> = (props: Props) => {

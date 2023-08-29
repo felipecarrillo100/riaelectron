@@ -7,11 +7,13 @@ import {ApolloProvider} from "@apollo/client";
 import {createNewApolloClient} from "./components/hxdr/client/HxDRClient";
 import {AuthState, HxDRAuthContext} from "./components/hxdr/client/HxDRAuthContext";
 import {setHxDRAccessToken} from "./components/hxdr/tokens/HxDRTokens";
+import {UICommand} from "./interfaces/UICommand";
 
 const client = createNewApolloClient();
 
 function App() {
     const [authenticated, setAuthenticated] = useState(AuthState.NotAuthenticated);
+    const [command, sendCommand] = useState(null as UICommand | null)
 
     useEffect(() => {
         electronBridge.ipcRenderer?.on("hxdr-token", handleTokenChange);
@@ -37,7 +39,7 @@ function App() {
   }
 
   return (
-      <HxDRAuthContext.Provider value={{authenticated, setAuthenticated}}>
+      <HxDRAuthContext.Provider value={{authenticated, setAuthenticated, command, sendCommand}}>
           <ApolloProvider client={client}>
             <div className="App" >
               <div className="row-main">

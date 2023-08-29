@@ -1,8 +1,9 @@
 import React, {useState} from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {HxDRPAssetThumbnail, HxDRProjectAssetLayer} from "./HxDRProjectFoldersContainer";
+import {HxDRPAssetThumbnail} from "./HxDRProjectFoldersContainer";
 import {HxDRAssetContentsRenderer} from "./HxDRAssetContentsRenderer";
 import {WorkspaceBuilderAction} from "../../../interfaces/WorkspaceBuilderAction";
+import {LayerInfoHxDR} from "../utils/CreateHxDRLayerCommand";
 
 
 interface Props {
@@ -11,10 +12,10 @@ interface Props {
         name: string;
         thumbnailPath: string;
     };
-    onItemSelected(properties: HxDRProjectAssetLayer, index?: number): void;
-    onItemSelectedDoubleClick?(properties: HxDRProjectAssetLayer, index?: number): void;
+    onItemSelected(properties: LayerInfoHxDR, index?: number): void;
+    onItemSelectedDoubleClick?(properties: LayerInfoHxDR, index?: number): void;
     onSetThumbnail?(thumbnail: HxDRPAssetThumbnail): void;
-    currentLayer: HxDRProjectAssetLayer | null;
+    currentLayer: LayerInfoHxDR | null;
 }
 
 export function HxDRFindAssetEndPoint(assetContents: any, type: WorkspaceBuilderAction) {

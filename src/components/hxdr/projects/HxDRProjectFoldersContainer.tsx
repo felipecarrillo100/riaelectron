@@ -4,14 +4,8 @@ import {HxDRFolderRenderer} from "./HxDRFolderRenderer";
 import {FormGroup, FormLabel} from "react-bootstrap";
 import "./HxDRProjectFoldersContainer.scss"
 import ScrollableDiv from "../../../components/scrollablediv/ScrollableDiv";
+import {LayerInfoHxDR} from "../utils/CreateHxDRLayerCommand";
 
-export interface HxDRProjectAssetLayer {
-    name: string;
-    id: string;
-    thumbnailPath: string;
-    type: "HSPC" |"OGC_3D_TILES" | "PANORAMIC";
-    endpoint: string;
-}
 
 export interface HxDRPAssetThumbnail {
     name: string;
@@ -21,10 +15,10 @@ export interface HxDRPAssetThumbnail {
 
 interface Props {
     project: HxDRProjectItem;
-    onItemSelected(properties: HxDRProjectAssetLayer, index?: number): void;
-    onItemSelectedDoubleClick?(properties: HxDRProjectAssetLayer, index?: number): void;
+    onItemSelected(properties: LayerInfoHxDR, index?: number): void;
+    onItemSelectedDoubleClick?(properties: LayerInfoHxDR, index?: number): void;
     onSetThumbnail(thumbnail: HxDRPAssetThumbnail): void;
-    currentLayer: HxDRProjectAssetLayer | null;
+    currentLayer: LayerInfoHxDR | null;
 }
 
 const HxDRProjectFoldersContainer: React.FC<Props> = (props: Props) => {
@@ -34,7 +28,7 @@ const HxDRProjectFoldersContainer: React.FC<Props> = (props: Props) => {
                 Select asset:
             </FormLabel>
 
-            <ScrollableDiv style={{color:"white"}} scrollheight={280} className="main-container">
+            <ScrollableDiv scrollheight={280} className="main-container">
                 <ul>
                     <HxDRFolderRenderer folderId={props.project.rootFolder.id} name="root"
                                         onItemSelected={props.onItemSelected}

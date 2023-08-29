@@ -5,6 +5,13 @@ import {UrlStore} from "@luciad/ria/model/store/UrlStore";
 import {getReference} from "@luciad/ria/reference/ReferenceProvider";
 import {HSPCTilesModel} from "@luciad/ria/model/tileset/HSPCTilesModel";
 import {WMSTileSetModel} from "@luciad/ria/model/tileset/WMSTileSetModel";
+import {UrlTileSetModel} from "@luciad/ria/model/tileset/UrlTileSetModel";
+import {createBounds} from "@luciad/ria/shape/ShapeFactory";
+import {FusionTileSetModel} from "@luciad/ria/model/tileset/FusionTileSetModel";
+import {MemoryStore} from "@luciad/ria/model/store/MemoryStore";
+import {WFSFeatureStore} from "@luciad/ria/model/store/WFSFeatureStore";
+import {GeoJsonCodec} from "@luciad/ria/model/codec/GeoJsonCodec";
+import {MyJSONOnlineStore} from "../stores/MyJSONOnlineStore";
 
 class ModelFactory {
     public static createBingmapsModel(command: any) {
@@ -136,10 +143,137 @@ class ModelFactory {
                 layers: modelOptions.layers,
                 transparent: typeof modelOptions.transparent !== "undefined" ? modelOptions.transparent : false,
                 imageFormat: typeof modelOptions.imageFormat !== "undefined" ? modelOptions.imageFormat : "image/png",
+                requestHeaders: modelOptions.requestHeaders,
+                requestParameters: modelOptions.requestParameters,
+                credentials: modelOptions.credentials
             });
             resolve(model);
         })
     }
+
+  static async  createWFSModel(modelOptions: any) {
+    return new Promise<FeatureModel>((resolve, reject)=> {
+      const options = {...modelOptions};
+     // const extension = (options.outputFormat.toLowerCase().indexOf("json") >= 0) ? "json" : "gml";
+      // options.outputFormat = (options.outputFormat.toLowerCase().indexOf("json") >= 0) ? "application/json" : "text/xml, application/xml";
+      const reference = getReference(options.referenceText);
+        options.reference = reference;
+        // eslint-disable-next-line no-self-assign
+        options.outputFormat = options.outputFormat;
+        let codecOptions = {};
+        const swapAxes = [reference.identifier, "CRS:84", "EPSG:4326"];
+        if (options.swapAxes) {
+          codecOptions = {
+            ...codecOptions, swapAxes
+          }
+        }
+        if (options.generateIDs) {
+          codecOptions = {...codecOptions, generateIDs:true}
+        }
+        // options.codec = CodecFactory.getFormatByName(extension).newCodec(codecOptions);
+        options.codec = new GeoJsonCodec(codecOptions);
+        delete options.attributionParams;
+
+        const store = (options.swapQueryAxes) ?
+          new WFSFeatureStore({...options, swapAxes}) :
+          new WFSFeatureStore(options) ;
+
+        const model = new FeatureModel(store);
+        if (model) {
+          resolve(model);
+        } else {
+          reject();
+        }
+
+    });
+  }
+  static async  createTMSModel(modelOptions: any) {
+    return new Promise<UrlTileSetModel>((resolve) => {
+      let options = {...modelOptions};
+
+      delete options.attributionParams;
+
+      const REF_WEBMERCATOR = getReference("EPSG:3857");
+      if (typeof options === "undefined") { // If options == undefined use default WMS layer
+        options = {
+          baseURL: "./backgroundmap/{z}/{x}/{y}.png",
+          levelCount: 18
+        };
+      }
+      options.bounds = createBounds(REF_WEBMERCATOR, [-20037508.34278924, 40075016.68557848, -20037508.3520, 40075016.7040]);
+      options.reference = REF_WEBMERCATOR;
+      const model = new UrlTileSetModel(options);
+      if (model) {
+        resolve(model);
+      }
+    });
+  }
+
+  static async  createLTSModel(modelOptions: any) {
+    return new Promise<FusionTileSetModel>((resolve, reject) => {
+      const reference = getReference(modelOptions.referenceText);
+      const referenceBounds = getReference(modelOptions.boundsObject.reference);
+        const model = new FusionTileSetModel({
+          coverageId: modelOptions.coverageId,
+          reference: reference,
+          bounds: createBounds(referenceBounds, modelOptions.boundsObject.coordinates),
+          dataType: modelOptions.dataType,
+          level0Columns: modelOptions.level0Columns,
+          level0Rows: modelOptions.level0Rows,
+          levelCount: 22,
+          samplingMode: modelOptions.samplingMode,
+          tileHeight: modelOptions.tileHeight,
+          tileWidth: modelOptions.tileWidth,
+          url: modelOptions.url,
+          requestHeaders: modelOptions.requestHeaders,
+          requestParameters: modelOptions.requestParameters,
+          credentials: modelOptions.credentials
+        });
+        if (model) {
+          resolve(model);
+        } else {
+          reject();
+        }
+    });
+  }
+
+  static async createMemoryFeatureModel(modelOptions: any) {
+    return new Promise<FeatureModel>((resolve, reject) => {
+      const reference = modelOptions.referenceText ? getReference(modelOptions.referenceText) : getReference("CRS:84");
+
+      const store = new MemoryStore({
+        reference
+      });
+      const model = new FeatureModel(store, {
+        reference
+      });
+      if (model) {
+        resolve(model);
+      } else {
+        reject();
+      }
+    });
+  }
+
+  static async createMyJSONOnlineFeatureModel(modelOptions: any) {
+    return new Promise<FeatureModel>((resolve, reject) => {
+      const reference = modelOptions.referenceText ? getReference(modelOptions.referenceText) : getReference("CRS:84");
+      const collection = modelOptions.collection ? modelOptions.collection : "";
+
+      const store = new MyJSONOnlineStore({
+        collection,
+        reference
+      });
+      const model = new FeatureModel(store, {
+        reference
+      });
+      if (model) {
+        resolve(model);
+      } else {
+        reject();
+      }
+    });
+  }
 
 
 }

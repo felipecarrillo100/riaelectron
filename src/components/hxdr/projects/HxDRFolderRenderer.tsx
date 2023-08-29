@@ -1,15 +1,16 @@
 import React, {useState} from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {HxDRPAssetThumbnail, HxDRProjectAssetLayer} from "./HxDRProjectFoldersContainer";
+import {HxDRPAssetThumbnail} from "./HxDRProjectFoldersContainer";
 import {HxDRFolderContentsRenderer} from "./HxDRFolderContentsRenderer";
+import {LayerInfoHxDR} from "../utils/CreateHxDRLayerCommand";
 
 interface Props {
     folderId: string;
     name: string;
-    onItemSelected(properties: HxDRProjectAssetLayer, index?: number): void;
-    onItemSelectedDoubleClick?(properties: HxDRProjectAssetLayer, index?: number): void;
+    onItemSelected(properties: LayerInfoHxDR, index?: number): void;
+    onItemSelectedDoubleClick?(properties: LayerInfoHxDR, index?: number): void;
     onSetThumbnail?(thumbnail: HxDRPAssetThumbnail): void;
-    currentLayer: HxDRProjectAssetLayer | null;
+    currentLayer: LayerInfoHxDR | null;
 }
 
 const HxDRFolderRenderer: React.FC<Props> = (props: Props) => {

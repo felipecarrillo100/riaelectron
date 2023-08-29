@@ -4,6 +4,7 @@ $brand-info:            #5bc0de !default;
 $brand-warning:         #f89406 !default;
 $brand-danger:          #ee5f5b !default;
 
+// $text-color:            #C8C8C8 !default;
 $text-color:            #C8C8C8 !default;
 $navbar-default-color:             $text-color !default;
 $navbar-default-link-color:                $text-color !default;
@@ -22,7 +23,8 @@ $black:    #000 !default;
 $body-bg:                   $gray-900 !default;
 $modal-content-bg:                  lighten($body-bg, 5%) !default;
 $gray-darker:            #272B30 !default; // #222
-$local-text-color: $gray-darker;
+// $local-text-color: $gray-darker;
+$local-text-color: black;
 
 .SlidingPanel-body {
     width: 100%;
@@ -36,84 +38,84 @@ $local-text-color: $gray-darker;
     border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;
 
-.form-group {
-//        background-color: $modal-content-bg;
-    background-color: transparent;
-    margin-bottom: 10px;
-}
-
-hr {
-    margin-top: 12px;
-    margin-bottom: 12px;
-    border-color: black;
-}
-
-.nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus {
-    background-color: $gray-600;
-}
-@media (min-width: 768px) {
-    .form-horizontal .control-label {
-        text-align: left;
+    .form-group {
+        //        background-color: $modal-content-bg;
+        background-color: transparent;
+        margin-bottom: 10px;
     }
-}
 
-/** Style Select / AsyncSelect */
-.select__option, .async-select__option {
-    color: $local-text-color;
-}
-.select-container, async-select-container {
-    border-radius: 5px;
-// z-index: 3;
-    height: 30px;
-    max-height: 30px;
-}
-.select__value-container, .async-select__value-container {
-    border-radius: 5px;
-    z-index: 3;
-}
-.select__control, .async-select__control {
-    border-radius: 5px;
-    height: 30px;
-    min-height: 30px;
-    max-height: 30px;
-}
-.input-group > .form-control:not(:last-child) {
-.async-select__control{
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-}
-}
+    hr {
+        margin-top: 12px;
+        margin-bottom: 12px;
+        border-color: black;
+    }
 
-.select__indicator, .async-select__indicator  {
-    padding: 4px;
-}
+    .nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus {
+        background-color: $gray-600;
+    }
+    @media (min-width: 768px) {
+        .form-horizontal .control-label {
+            text-align: left;
+        }
+    }
 
-.select__control, .async-select__control {
-    border-radius: 4px;
-    height: 30px;
-    min-height: 30px;
-    max-height: 30px;
-}
+    /** Style Select / AsyncSelect */
+    .select__option, .async-select__option {
+        color: $local-text-color;
+    }
+    .select-container, async-select-container {
+        border-radius: 5px;
+        // z-index: 3;
+        height: 30px;
+        max-height: 30px;
+    }
+    .select__value-container, .async-select__value-container {
+        border-radius: 5px;
+        z-index: 3;
+    }
+    .select__control, .async-select__control {
+        border-radius: 5px;
+        height: 30px;
+        min-height: 30px;
+        max-height: 30px;
+    }
+    .input-group > .form-control:not(:last-child) {
+        .async-select__control{
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+    }
 
-.select__control--is-focused, .async-select__control--is-focused {
-    border-radius: 4px;
-    border-color: $brand-primary;
-    box-shadow: 0 0 0 1px $brand-primary;
-    height: 30px;
-    min-height: 30px;
-    max-height: 30px;
-}
+    .select__indicator, .async-select__indicator  {
+        padding: 4px;
+    }
 
-.select__placeholder, .async-select__placeholder {
-    color: $text-color;
-}
+    .select__control, .async-select__control {
+        border-radius: 4px;
+        height: 30px;
+        min-height: 30px;
+        max-height: 30px;
+    }
 
-.select__control--is-focused:hover, .async-select__control--is-focused:hover {
-    border-color: lighten($brand-primary, 5%);
-    box-shadow: 0 0 0 1px $brand-primary;
-    color: $navbar-default-color;
-    color: white;
-}
+    .select__control--is-focused, .async-select__control--is-focused {
+        border-radius: 4px;
+        border-color: $brand-primary;
+        box-shadow: 0 0 0 1px $brand-primary;
+        height: 30px;
+        min-height: 30px;
+        max-height: 30px;
+    }
+
+    .select__placeholder, .async-select__placeholder {
+        color: $text-color;
+    }
+
+    .select__control--is-focused:hover, .async-select__control--is-focused:hover {
+        border-color: lighten($brand-primary, 5%);
+        box-shadow: 0 0 0 1px $brand-primary;
+        color: $navbar-default-color;
+        color: white;
+    }
 }
 
 .SlidingPanel-body > .form-horizontal .form-group {
@@ -130,7 +132,7 @@ hr {
 
 .SlidingPanel-body .col-sm-12 {
     padding-top: 0px;
-//  text-align: left;  //  FIX for RTL
+    //  text-align: left;  //  FIX for RTL
 }
 
 .SlidingPanel-body .table > thead > tr > th {
@@ -183,12 +185,12 @@ hr {
 .async-select__menu, .SlidingPanel-body .async-select__menu {
     margin-top: 0!important;
     z-index: 4;
-.select__option--is-focused, .async-select__option--is-focused,
-.select__option--is-selected, .async-select__option--is-selected {
-    background-color: lighten($brand-primary, 5%);
-    color: $navbar-default-color;
-    color: white;
-}
+    .select__option--is-focused, .async-select__option--is-focused,
+    .select__option--is-selected, .async-select__option--is-selected {
+        background-color: lighten($brand-primary, 5%);
+        color: $navbar-default-color;
+        color: white;
+    }
 }
 
 
@@ -248,6 +250,7 @@ $line-height-value: 24px;
         }
         .tbody {
             .row {
+                color: $local_text-color;
                 max-width: 100%;
                 margin-left: 1px;
                 margin-right: 1px;

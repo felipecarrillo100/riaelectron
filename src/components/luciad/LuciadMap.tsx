@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, {useContext, useEffect, useRef, useState} from "react";
 import "./LuciadMap.css"
 import {WebGLMap} from "@luciad/ria/view/WebGLMap";
 import {getReference} from "@luciad/ria/reference/ReferenceProvider";
@@ -11,7 +11,6 @@ import {
 import {ClosePanoramaButton} from "./ClosePanoramaButton";
 
 
-import {createHxDRLayer} from "./hxdr/HxDRLayerUtils";
 import {FeatureLayer} from "@luciad/ria/view/feature/FeatureLayer";
 import {CreateNewLayer} from "./factories/CreateNewLayer";
 import {
@@ -19,13 +18,42 @@ import {
     attachPanoToMap,
     detachPanoFromMap
 } from "./controls/panocontroller/actions/PanoAttach";
-import {HxDRProjectAssetLayer} from "../hxdr/projects/HxDRProjectFoldersContainer";
-import {CreateLayerInfo} from "../../interfaces/CreateLayerInfo";
+import {HxDRAuthContext} from "../hxdr/client/HxDRAuthContext";
+import {UICommand} from "../../interfaces/UICommand";
+import {UICommandActions} from "../../interfaces/UICommandActions";
 
 interface Props {
     id?: string;
 }
 const LuciadMap: React.FC<Props> = (props: Props)=>{
+    const {command} = useContext(HxDRAuthContext);
+
+    useEffect(()=>{
+        if (command) {
+            processCommand(command);
+        }
+    }, [command]);
+
+const processCommand = (command: UICommand) =>{
+        //  Implement layer creation here!!
+        if (command.action===UICommandActions.CreateAnyLayer) {
+            CreateNewLayer(command.parameters).then((layer: any)=> {
+                if (layer && map.current) {
+                    map.current.layerTree.addChild(layer);
+                    if (layer instanceof FeatureLayer) {
+                        if (LayerFactory.isFusionPanoramaLayer(layer)) {
+                            attachPanoControllerToMap(map.current);
+                        }
+                    }
+                    if (command.parameters.autoZoom){
+                        LayerFactory.getLayerBounds(layer).then(bounds=>{
+                            map.current?.mapNavigator.fit({bounds, animate: true});
+                        });
+                    }
+                }
+            });
+        }
+    }
 
     const [panoModeEnabled, setPanoModeEnabled] = useState(false);
     const panoModeEnabledRef = useRef(false);
@@ -137,38 +165,6 @@ const LuciadMap: React.FC<Props> = (props: Props)=>{
                 panoActions.leavePanoramaMode()
             }
         }
-    }
-
-    const onHxDRLayerRequested = (layerInfo: HxDRProjectAssetLayer, index?: number) => {
-        createHxDRLayer(layerInfo).then((layer: any)=>{
-            if (layer && map.current) {
-                map.current.layerTree.addChild(layer);
-                if (layer instanceof  FeatureLayer) {
-                    if (LayerFactory.isFusionPanoramaLayer(layer)) {
-                        attachPanoControllerToMap(map.current);
-                    }
-                }
-                LayerFactory.getLayerBounds(layer).then(bounds=>{
-                    map.current?.mapNavigator.fit({bounds, animate: true});
-                });
-            }
-        });
-    }
-
-    const onNewLayerRequested = (layerInfo: CreateLayerInfo, index?: number) => {
-        CreateNewLayer(layerInfo).then((layer: any)=> {
-            if (layer && map.current) {
-                map.current.layerTree.addChild(layer);
-                if (layer instanceof  FeatureLayer) {
-                    if (LayerFactory.isFusionPanoramaLayer(layer)) {
-                        attachPanoControllerToMap(map.current);
-                    }
-                }
-                LayerFactory.getLayerBounds(layer).then(bounds=>{
-                    map.current?.mapNavigator.fit({bounds, animate: true});
-                });
-            }
-        });
     }
 
     return (<div className="LuciadMap" id={props.id} ref={element}>

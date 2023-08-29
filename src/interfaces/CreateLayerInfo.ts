@@ -1,8 +1,8 @@
-import {WorkspaceBuilderAction} from "./WorkspaceBuilderAction";
+import {UILayerTypes} from "./UILayerTypes";
 
 export interface CreateLayerInfo {
     fitBounds: any;
-    layerType: WorkspaceBuilderAction,
+    layerType: UILayerTypes,
     model: any;
     layer: any;
     autoZoom: boolean;

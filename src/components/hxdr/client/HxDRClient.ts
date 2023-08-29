@@ -15,7 +15,7 @@ export const CacheSettings:  InMemoryCacheConfig = {
 }
 
 function getUrl() {
-    const x = electronBridge.hxdrServer.getUrl();
+    const x = electronBridge.hxdrServer.getUrl()+"/graphql";
     console.log(x);
     return x;
 }

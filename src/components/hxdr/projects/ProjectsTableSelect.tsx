@@ -32,7 +32,7 @@ const ProjectsTableSelect: React.FC<Props> = (props: Props) => {
                     </Col>
                 </Row>
             </div>
-            <div style={{color:"white"}} className="main-container">
+            <div className="main-container">
                 {props.projectItems.length >0 ?
                     <div className="tbody">
                         {props.projectItems.map((row: HxDRProjectItem, index: number) => {

@@ -1,7 +1,7 @@
 import React, {useEffect, useRef, useState} from "react";
 
 import {gql, useQuery} from "@apollo/client";
-import {FormControl, FormGroup, FormLabel, InputGroup} from "react-bootstrap";
+import {FormControl, FormGroup, InputGroup} from "react-bootstrap";
 
 import Pagination from "replace-js-pagination";
 import {ProjectsTableSelect} from "./ProjectsTableSelect";
@@ -168,11 +168,8 @@ const HxDRProjectsLIst: React.FC<Props> = (props: Props) => {
 
     return (
         <>
-            <FormGroup controlId="hxdr-project-filter-id">
-                <FormLabel>
-                    Search by project name
-                </FormLabel>
-                <InputGroup >
+            <FormGroup controlId="hxdr-project-filter-id" >
+                <InputGroup size="sm">
                         <InputGroup.Text>
                             F
                         </InputGroup.Text>
@@ -185,9 +182,6 @@ const HxDRProjectsLIst: React.FC<Props> = (props: Props) => {
             </FormGroup>
 
             <FormGroup controlId="hxdr-select-project-id">
-                <FormLabel>
-                   Select a project: ({ !loading ? ""+ projectItems.length + "/" + total : "..."})
-                </FormLabel>
                 <ProjectsTableSelect name="project" project={props.project} handleChange={handleChange} projectItems={projectItems} loading={loading} />
             </FormGroup>
 
