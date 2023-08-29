@@ -159,6 +159,11 @@ function about() {
         title: "About",
         width:  480,
         height: 580,
+        webPreferences: {
+            contextIsolation: true,
+            nodeIntegration: true,
+            preload: path.join(__dirname, "./preload.js")
+        },
     });
 
     aboutWindow.setMenu(null);
