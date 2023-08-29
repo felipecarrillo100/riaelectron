@@ -1,9 +1,10 @@
-import React from "react";
+import React, {useContext} from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {useQuery} from "@apollo/client";
 import Glyphicon from "../../../components/glyphicon/Glyphicon";
 import {HxDRGetAssetDetailsNew} from "../queries/graphql.queries";
 import {ArtifactSimplified, LayerInfoHxDR} from "../utils/CreateHxDRLayerCommand";
+import {HxDRProjectContext} from "../contextprovider/HxDRProjectContext";
 
 
 const LayeerTypeTranslate = {

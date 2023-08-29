@@ -6,6 +6,7 @@ import {LayerInfoHxDR} from "../utils/CreateHxDRLayerCommand";
 import {ApplicationContext} from "../../../contextprovider/ApplicationContext";
 import {electronBridge} from "../../../electronbridge/Bridge";
 import {Button, Form, Modal} from "react-bootstrap";
+import {HxDRProjectContext} from "../contextprovider/HxDRProjectContext";
 
 
 const availableTypes = [
@@ -20,9 +21,13 @@ interface Props {
     currentLayer: LayerInfoHxDR | null;
 }
 
+type ActionTypes = "create-folder" | "create-asset" | "folder-info";
+
 const HxDRFolderRenderer: React.FC<Props> = (props: Props) => {
+    const {project} = useContext(HxDRProjectContext);
+
     const [show, setShow] = useState(false);
-    const [action, setAction] = useState("create-asset");
+    const [action, setAction] = useState("create-asset" as ActionTypes);
 
     const [inputs, setInputs] = useState({
         name: "",
@@ -38,7 +43,7 @@ const HxDRFolderRenderer: React.FC<Props> = (props: Props) => {
         }, 200);
         setShow(false);
     }
-    const handleShow = (anAction: "create-folder" | "create-asset") => {
+    const handleShow = (anAction:  ActionTypes) => {
         setAction(anAction)
         setShow(true);
     }
@@ -76,6 +81,12 @@ const HxDRFolderRenderer: React.FC<Props> = (props: Props) => {
         })
     }
 
+    const showFolderInfo = () => {
+        console.log("Show folder info: " + props.folderId);
+        handleShow("folder-info");
+
+    }
+
     const handleContextMenu = (event: any)=>{
         event.preventDefault();
         contextMenu?.show({
@@ -97,6 +108,14 @@ const HxDRFolderRenderer: React.FC<Props> = (props: Props) => {
                         title: "Creates a new asset",
                         action: createAsset
                     },
+                    {
+                        separator: true
+                    },
+                    {
+                        label: "Folder Info",
+                        title: "Display information about the folder",
+                        action: showFolderInfo
+                    },
                 ]
             }
         });
@@ -112,6 +131,10 @@ const HxDRFolderRenderer: React.FC<Props> = (props: Props) => {
             setInputs(newInputs);
         }
     };
+
+    const info =
+        `Project ID: ${project ? project.id :""}
+Folder ID: ${props.folderId}`
 
     return (
         <>
@@ -139,26 +162,33 @@ const HxDRFolderRenderer: React.FC<Props> = (props: Props) => {
                     { action === "create-folder" ?
                         <Modal.Title>Create Folder</Modal.Title>
                         :
-                        <Modal.Title>Create Asset</Modal.Title>
+                        action === "create-asset" ?
+                        <Modal.Title>Create Asset</Modal.Title> :
+                        <Modal.Title>Folder Info</Modal.Title>
                     }
 
                 </Modal.Header>
                 <Modal.Body>
-                    <Form>
-                        <Form.Group className="mb-3" controlId="create-name-id">
+                    { project && <Form>
+                        <Form.Group className="mb-3" controlId="create-project-name-id">
+                            <Form.Label>Project: "<span>{project.name}</span>"</Form.Label>
+                        </Form.Group>
+                        <Form.Group className="mb-3" controlId="create-folder-name-id">
                             <Form.Label>Parent folder: "<span>{props.name}</span>"</Form.Label>
                         </Form.Group>
-                        <Form.Group className="mb-3" controlId="create-name-id">
-                            <Form.Label>New {action==="create-folder" ? "folder" : "asset"} name:</Form.Label>
-                            <Form.Control
-                                type="text"
-                                placeholder="Name"
-                                autoFocus
-                                name="name"
-                                value={inputs.name}
-                                onChange={handleChange}
-                            />
-                        </Form.Group>
+                        {action !== "folder-info" &&
+                            <Form.Group className="mb-3" controlId="create-name-id">
+                                <Form.Label>New {action==="create-folder" ? "folder" : "asset"} name:</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    placeholder="Name"
+                                    autoFocus
+                                    name="name"
+                                    value={inputs.name}
+                                    onChange={handleChange}
+                                />
+                            </Form.Group>
+                        }
                         {action === "create-asset" &&
                             <Form.Group
                                 className="mb-3"
@@ -170,7 +200,16 @@ const HxDRFolderRenderer: React.FC<Props> = (props: Props) => {
                                 </Form.Control>
                             </Form.Group>
                         }
-                    </Form>
+                        {action === "folder-info" &&
+                            <Form.Group
+                                className="mb-3"
+                                controlId="show-info-id"
+                            >
+                                <Form.Label>Info</Form.Label>
+                                <Form.Control as="textarea" name="type" value={info} readOnly={true} />
+                            </Form.Group>
+                        }
+                            </Form>}
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={handleClose}>

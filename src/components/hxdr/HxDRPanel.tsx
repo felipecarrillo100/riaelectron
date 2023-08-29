@@ -5,6 +5,7 @@ import HxDRProjectsLIst, {HxDRProjectItem} from "./projects/HxDRProjectsLIst";
 import {HxDRProjectFoldersContainer} from "./projects/HxDRProjectFoldersContainer";
 import {CreateHxDRLayerCommand, LayerInfoHxDR} from "./utils/CreateHxDRLayerCommand";
 import {ApplicationContext} from "../../contextprovider/ApplicationContext";
+import {HxDRProjectContext} from "./contextprovider/HxDRProjectContext";
 
 export const HxDRPanel: React.FC = () => {
     const {sendCommand} = useContext(ApplicationContext);
@@ -32,15 +33,18 @@ export const HxDRPanel: React.FC = () => {
         }
     }
     return (
-        <div className="HxDRProjectsTab">
-            <HxDRProjectsLIst project={project as any} setProject={setProject}/>
-            <HxDRProjectFoldersContainer
-                project={project as HxDRProjectItem}
-                onItemSelected={onItemSelected}
-                onItemSelectedDoubleClick={onItemSelectedDoubleClick}
-                onSetThumbnail={()=>{}}
-                currentLayer={currentLayer}
-            />
-        </div>
+        <HxDRProjectContext.Provider value={{project, setProject}}>
+            <div className="HxDRProjectsTab">
+                <HxDRProjectsLIst project={project as any} setProject={setProject}/>
+                <HxDRProjectFoldersContainer
+                    project={project as HxDRProjectItem}
+                    onItemSelected={onItemSelected}
+                    onItemSelectedDoubleClick={onItemSelectedDoubleClick}
+                    onSetThumbnail={()=>{}}
+                    currentLayer={currentLayer}
+                />
+            </div>
+        </HxDRProjectContext.Provider>
+
     )
 }
