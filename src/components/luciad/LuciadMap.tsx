@@ -18,7 +18,7 @@ import {
     attachPanoToMap,
     detachPanoFromMap
 } from "./controls/panocontroller/actions/PanoAttach";
-import {HxDRAuthContext} from "../hxdr/client/HxDRAuthContext";
+import {ApplicationContext} from "../../contextprovider/ApplicationContext";
 import {UICommand} from "../../interfaces/UICommand";
 import {UICommandActions} from "../../interfaces/UICommandActions";
 
@@ -26,7 +26,7 @@ interface Props {
     id?: string;
 }
 const LuciadMap: React.FC<Props> = (props: Props)=>{
-    const {command} = useContext(HxDRAuthContext);
+    const {command} = useContext(ApplicationContext);
 
     useEffect(()=>{
         if (command) {

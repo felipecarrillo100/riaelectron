@@ -3,7 +3,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {HxDRPAssetThumbnail} from "./HxDRProjectFoldersContainer";
 import {HxDRFolderContentsRenderer} from "./HxDRFolderContentsRenderer";
 import {LayerInfoHxDR} from "../utils/CreateHxDRLayerCommand";
-import {HxDRAuthContext} from "../client/HxDRAuthContext";
+import {ApplicationContext} from "../../../contextprovider/ApplicationContext";
 import {electronBridge} from "../../../electronbridge/Bridge";
 import {Button, Form, Modal} from "react-bootstrap";
 
@@ -49,7 +49,7 @@ const HxDRFolderRenderer: React.FC<Props> = (props: Props) => {
     }
 
     const [expanded, setExpanded] = useState(false);
-    const {contextMenu} = useContext(HxDRAuthContext);
+    const {contextMenu} = useContext(ApplicationContext);
 
 
     const onClickFolder = () => {

@@ -4,10 +4,10 @@ import "./HxDRPanel.scss"
 import HxDRProjectsLIst, {HxDRProjectItem} from "./projects/HxDRProjectsLIst";
 import {HxDRProjectFoldersContainer} from "./projects/HxDRProjectFoldersContainer";
 import {CreateHxDRLayerCommand, LayerInfoHxDR} from "./utils/CreateHxDRLayerCommand";
-import {HxDRAuthContext} from "./client/HxDRAuthContext";
+import {ApplicationContext} from "../../contextprovider/ApplicationContext";
 
 export const HxDRPanel: React.FC = () => {
-    const {sendCommand} = useContext(HxDRAuthContext);
+    const {sendCommand} = useContext(ApplicationContext);
 
     const [project, setProject] = useState(null as HxDRProjectItem | null);
     const [currentLayer, setCurrentLayer] = useState(null as LayerInfoHxDR | null);

@@ -1,5 +1,5 @@
 import {createContext} from "react";
-import {UICommand} from "../../../interfaces/UICommand";
+import {UICommand} from "../interfaces/UICommand";
 import CustomContextMenu from "react-class-contexify";
 
 export enum AuthState {
@@ -8,7 +8,7 @@ export enum AuthState {
     NotAuthenticated = "NotAuthenticated",
 }
 
-interface HxDRAuthContextType {
+interface ApplicationContextType {
     authenticated: AuthState;
     setAuthenticated: (v: AuthState) => void;
     command: UICommand | null;
@@ -16,4 +16,4 @@ interface HxDRAuthContextType {
     contextMenu: CustomContextMenu | null;
 };
 
-export const HxDRAuthContext = createContext<HxDRAuthContextType>({} as any);
+export const ApplicationContext = createContext<ApplicationContextType>({} as any);

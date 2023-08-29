@@ -5,7 +5,7 @@ import {electronBridge} from "./electronbridge/Bridge";
 import {HxDRPanel} from "./components/hxdr/HxDRPanel";
 import {ApolloProvider} from "@apollo/client";
 import {createNewApolloClient} from "./components/hxdr/client/HxDRClient";
-import {AuthState, HxDRAuthContext} from "./components/hxdr/client/HxDRAuthContext";
+import {AuthState, ApplicationContext} from "./contextprovider/ApplicationContext";
 import {setHxDRAccessToken} from "./components/hxdr/tokens/HxDRTokens";
 import {UICommand} from "./interfaces/UICommand";
 import CustomContextMenu from "react-class-contexify";
@@ -50,7 +50,7 @@ function App() {
   }
 
   return (
-      <HxDRAuthContext.Provider value={{authenticated, setAuthenticated, command, sendCommand, contextMenu}}>
+      <ApplicationContext.Provider value={{authenticated, setAuthenticated, command, sendCommand, contextMenu}}>
           <ApolloProvider client={client}>
             <div className="App" >
                 <CustomContextMenu menuID="menuforfeatures" ref={contextMenuRef}/>
@@ -73,7 +73,7 @@ function App() {
               </div>
             </div>
           </ApolloProvider>
-      </HxDRAuthContext.Provider>
+      </ApplicationContext.Provider>
   );
 }
 
