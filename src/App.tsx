@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import './App.css';
+import './App.scss';
 import {LuciadMap} from "./components/luciad/LuciadMap";
 import {electronBridge} from "./electronbridge/Bridge";
 import {HxDRPanel} from "./components/hxdr/HxDRPanel";
@@ -9,12 +9,14 @@ import {AuthState, ApplicationContext} from "./contextprovider/ApplicationContex
 import {setHxDRAccessToken} from "./components/hxdr/tokens/HxDRTokens";
 import {UICommand} from "./interfaces/UICommand";
 import CustomContextMenu from "react-class-contexify";
+import {Tab, Tabs} from "react-bootstrap";
 
 const client = createNewApolloClient();
 
 function App() {
     const contextMenuRef = useRef(null);
 
+    const [key, setKey] = useState('home');
     const [authenticated, setAuthenticated] = useState(AuthState.NotAuthenticated);
     const [command, sendCommand] = useState(null as UICommand | null)
     const [contextMenu, setContextMenu] = useState(null as CustomContextMenu | null)
@@ -66,9 +68,25 @@ function App() {
                   </div>
                 </div>
                 <div className="column2" >
-                  <div className="MapHolder">
-                    <LuciadMap />
-                  </div>
+                    <Tabs
+                        id="controlled-tab-example"
+                        activeKey={key}
+                        onSelect={(k) => setKey(k as string)}
+                        className="mb-3"
+                    >
+                        <Tab eventKey="home" title="Home">
+                            <div className="MapHolder">
+                                <LuciadMap />
+                            </div>
+                        </Tab>
+                        <Tab eventKey="profile" title="Uploads">
+                            Asset uploads will be here
+                        </Tab>
+                        <Tab eventKey="contact" title="Jobs">
+                            Processing jobs will be added here
+                        </Tab>
+                    </Tabs>
+
                 </div>
               </div>
             </div>

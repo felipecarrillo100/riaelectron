@@ -29,6 +29,24 @@
   bottom: 0;
   right: 0;
   overflow: hidden;
+
+  .nav-tabs {
+    position: absolute;
+    top:0;
+    left: 0;
+    right: 0;
+    height: 40px;
+  }
+  .tab-content {
+    position: absolute;
+    top:40px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    div[role=tabpanel] {
+      height: 100%;
+    }
+  }
 }
 
 .MapHolder {
