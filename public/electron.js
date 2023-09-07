@@ -1,9 +1,18 @@
 const path = require('path');
+const {HxDrServer} = require("./modules/settings");
+
 
 const { app, BrowserWindow, ipcMain, Menu, screen, dialog} = require('electron');
 
 const staticC = require("node-static");
 const http = require("http");
+const {GraphqlClient} = require("hxdrassetupload/lib/graphql/GraphqlClient");
+const {initializeGraphQlClient} = require("hxdrassetupload/lib/hxdrlib/MutationLibrary");
+const introspection = require("hxdrassetupload/lib/hxdrlib/introspection");
+
+const fetch = require('cross-fetch');
+const {NDBSqLite} = require("ndbsqlite/lib/NDBSqLite");
+const {HxDRAssetUpload} = require("hxdrassetupload/lib/HxDRAssetUpload");
 
 let mainWindow = null;
 let myLoginWindow = null;
@@ -11,7 +20,34 @@ function isDevelopment() {
     return process.argv[2] == '--dev';
 }
 
+let __token = "";
+function getToken() {
+    return __token;
+}
+function setToken(token) {
+    __token = token;
+}
+
+const database = new NDBSqLite({filePath:"test.db.sqlite"});
+const sqlpath = path.join(__dirname, "../node_modules/hxdrassetupload/lib/sql/dbschema.sql");
+
+let hxDrAsseUploadManager = null;
+database.init(sqlpath).then(db=>{
+    const hxDrAsseUpload= new HxDRAssetUpload({db});
+    hxDrAsseUploadManager = hxDrAsseUpload;
+});
+
+
 const isDev = isDevelopment();
+const uri = `${HxDrServer}/graphql`; // <-- add the URL of the GraphQL server here
+
+const graphqlClient = new GraphqlClient({
+    accessTokeProvider: getToken,
+    uri,
+    possibleTypes: introspection.possibleTypes,
+    fetch: fetch
+});
+initializeGraphQlClient(graphqlClient.createClient());
 
 const menu = [
     {
@@ -133,6 +169,38 @@ ipcMain.on("canal5", (e, options)=>{
     console.log(JSON.stringify(options));
 })
 
+ipcMain.on("hxdr-command", (e, options)=>{
+    switch (options.type) {
+        case "delete-asset-by-assetId":
+            if (hxDrAsseUploadManager) {
+                console.log(`Deleting asset ${options.assetId}`);
+                hxDrAsseUploadManager.deleteAsset(options.assetId).then(result=>{
+                    console.log(JSON.stringify(result));
+                    if (result.success) {
+                        mainWindow.webContents.send("hxdr-feedback", {
+                            success: true
+                        })
+                    }{}
+                });
+            }
+            break;
+        case "delete-folder-by-folderId":
+            if (hxDrAsseUploadManager) {
+                console.log(`Deleting folder ${options.folderId} from ${options.projectId}`);
+                hxDrAsseUploadManager.deleteFolder(options.folderId, options.projectId).then(result=>{
+                    console.log(JSON.stringify(result));
+                    if (result.success) {
+                        mainWindow.webContents.send("hxdr-feedback", {
+                            success: true
+                        })
+                    }
+                });
+            }
+            break;
+    }
+})
+
+
 ipcMain.on("hxdr", (e, options)=>{
     switch (options.type) {
         case "closeWindow":
@@ -142,6 +210,8 @@ ipcMain.on("hxdr", (e, options)=>{
             win.close();
             Menu.getApplicationMenu().getMenuItemById('login-id').enabled = false;
             Menu.getApplicationMenu().getMenuItemById('logout-id').enabled = true;
+
+            setToken(options.accessToken);
 
             mainWindow.webContents.send("hxdr-token", {
                 refreshToken: options.refreshToken,

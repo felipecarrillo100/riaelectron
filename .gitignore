@@ -12,6 +12,9 @@ static/hxdr.js
 /.pnp
 .pnp.js
 
+# data
+*.db.sqlite
+
 # testing
 /coverage
 

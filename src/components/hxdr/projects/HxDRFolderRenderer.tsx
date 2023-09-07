@@ -21,7 +21,7 @@ interface Props {
     currentLayer: LayerInfoHxDR | null;
 }
 
-type ActionTypes = "create-folder" | "create-asset" | "folder-info";
+type ActionTypes = "create-folder" | "create-asset" | "folder-info" | "delete-folder";
 
 const HxDRFolderRenderer: React.FC<Props> = (props: Props) => {
     const {project} = useContext(HxDRProjectContext);
@@ -49,8 +49,10 @@ const HxDRFolderRenderer: React.FC<Props> = (props: Props) => {
     }
 
     const handleCommit = () => {
-
         handleClose();
+        if (action === "delete-folder") {
+
+        }
     }
 
     const [expanded, setExpanded] = useState(false);
@@ -81,6 +83,16 @@ const HxDRFolderRenderer: React.FC<Props> = (props: Props) => {
         })
     }
 
+    const deleteFolder = () => {
+        if (project) {
+            electronBridge.ipcRenderer.send("hxdr-command", {
+                type: "delete-folder-by-folderId",
+                folderId: props.folderId.trim(),
+                projectId: project.id.trim()
+            })
+        }
+    }
+
     const showFolderInfo = () => {
         console.log("Show folder info: " + props.folderId);
         handleShow("folder-info");
@@ -100,12 +112,17 @@ const HxDRFolderRenderer: React.FC<Props> = (props: Props) => {
                         action: createFolder
                     },
                     {
-                        separator: true
-                    },
-                    {
                         label: "Create asset",
                         title: "Creates a new asset",
                         action: createAsset
+                    },
+                    {
+                        separator: true
+                    },
+                    {
+                        label: "Delete folder",
+                        title: "Delete selected folder",
+                        action: deleteFolder
                     },
                     {
                         separator: true
@@ -135,6 +152,19 @@ const HxDRFolderRenderer: React.FC<Props> = (props: Props) => {
         `Project ID: ${project ? project.id :""}
 Folder ID: ${props.folderId}`
 
+    const returnHeader = (action:ActionTypes) => {
+        switch (action) {
+            case "delete-folder":
+                return <Modal.Title>Create Folder</Modal.Title>;
+            case "create-asset":
+                return <Modal.Title>Create Asset</Modal.Title>;
+            case "create-asset":
+                return <Modal.Title>Create Asset</Modal.Title>
+            case "folder-info":
+                return <Modal.Title>Folder Info</Modal.Title>
+        }
+    }
+
     return (
         <>
             <li className="HxDRFolderRenderer">
@@ -158,14 +188,7 @@ Folder ID: ${props.folderId}`
 
             <Modal show={show} onHide={handleClose}>
                 <Modal.Header closeButton>
-                    { action === "create-folder" ?
-                        <Modal.Title>Create Folder</Modal.Title>
-                        :
-                        action === "create-asset" ?
-                        <Modal.Title>Create Asset</Modal.Title> :
-                        <Modal.Title>Folder Info</Modal.Title>
-                    }
-
+                    { returnHeader(action) }
                 </Modal.Header>
                 <Modal.Body>
                     { project && <Form>
@@ -215,7 +238,7 @@ Folder ID: ${props.folderId}`
                         Close
                     </Button>
                     <Button variant="primary" onClick={handleCommit}>
-                        Create
+                        OK
                     </Button>
                 </Modal.Footer>
             </Modal>

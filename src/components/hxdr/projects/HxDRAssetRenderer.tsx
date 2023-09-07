@@ -7,6 +7,7 @@ import {LayerInfoHxDR} from "../utils/CreateHxDRLayerCommand";
 import {ApplicationContext} from "../../../contextprovider/ApplicationContext";
 import {Button, Form, Modal} from "react-bootstrap";
 import {HxDRProjectContext} from "../contextprovider/HxDRProjectContext";
+import {electronBridge} from "../../../electronbridge/Bridge";
 
 type ActionTypes = "delete-confirm" | "asset-info";
 
@@ -116,6 +117,12 @@ const HxDRAssetRenderer: React.FC<Props> = (props: Props) => {
 
     const handleCommit = () => {
         handleClose();
+        if (action==="delete-confirm") {
+            electronBridge.ipcRenderer.send("hxdr-command", {
+                type: "delete-asset-by-assetId",
+                assetId: props.asset.id,
+            })
+        }
     }
 
   //  const active = props.currentLayer && props.currentLayer && props.currentLayer.id === props.asset.id ? " active" : "";
