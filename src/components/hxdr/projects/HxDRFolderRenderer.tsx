@@ -84,7 +84,6 @@ const HxDRFolderRenderer: React.FC<Props> = (props: Props) => {
     const showFolderInfo = () => {
         console.log("Show folder info: " + props.folderId);
         handleShow("folder-info");
-
     }
 
     const handleContextMenu = (event: any)=>{
