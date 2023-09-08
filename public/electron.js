@@ -13,6 +13,8 @@ const introspection = require("hxdrassetupload/lib/hxdrlib/introspection");
 const fetch = require('cross-fetch');
 const {NDBSqLite} = require("ndbsqlite/lib/NDBSqLite");
 const {HxDRAssetUpload} = require("hxdrassetupload/lib/HxDRAssetUpload");
+const {HxDRUploadStatusEnum} = require("hxdrassetupload/lib/core/models/HxDRUploadStatusEnum");
+const {HxDRAssetUploadTask} = require("hxdrassetupload/lib/core/models/HxDRAssetUploadTask");
 
 let mainWindow = null;
 let myLoginWindow = null;
@@ -56,7 +58,7 @@ const menu = [
             {
                 id: "disk-id",
                 label: "Select asset Files",
-                click: ()=> selectFolder(),
+                click: ()=> selectFolder("LAS_UPLOAD"),
                 accelerator: "CmdOrCtrl+F",
                 enabled: true
             },
@@ -169,6 +171,30 @@ ipcMain.on("canal5", (e, options)=>{
     console.log(JSON.stringify(options));
 })
 
+ipcMain.on("db-query", (e, options)=>{
+    if (!hxDrAsseUploadManager) return;
+    const repositories = hxDrAsseUploadManager.getRepositories();
+    if (!repositories) return;
+    switch (options.type) {
+        case "queryLike":
+            if (typeof repositories[options.repository] !== "undefined") {
+                repositories[options.repository].queryLike(options.query).then(values=>{
+                    console.log(JSON.stringify(values));
+                    mainWindow.webContents.send("db-feedback", {
+                        success: true,
+                        refresh: {
+                            repository: options.repository,
+                            query: options.query
+                        }
+                    })
+                })
+            }
+         break;
+        default:
+            break;
+    }
+});
+
 ipcMain.on("hxdr-command", (e, options)=>{
     switch (options.type) {
         case "delete-asset-by-assetId":
@@ -203,6 +229,32 @@ ipcMain.on("hxdr-command", (e, options)=>{
                 });
             }
             break;
+        case "create-asset":
+            if (hxDrAsseUploadManager) {
+                const files =[];
+                console.log(`Create asset ${JSON.stringify(options)}`);
+                const task = new HxDRAssetUploadTask({
+                    assetName: options.folderName,
+                    assetId: "",
+                    parentFolderId: options.folderId,
+                    assetType: options.assetType,
+                    status:  HxDRUploadStatusEnum.NEW
+                })
+                selectFolder(options.assetType, ()=>{
+                    hxDrAsseUploadManager.addNewTask(task, files).then(result=>{
+                        console.log(JSON.stringify(result));
+                        if (result.success) {
+                            mainWindow.webContents.send("hxdr-feedback", {
+                                success: true,
+                                refresh: {
+                                    parentFolder: options.parentFolder
+                                }
+                            })
+                        }
+                    });
+                })
+            }
+            break;
         case "create-folder":
             if (hxDrAsseUploadManager) {
                 console.log(`Create folder ${JSON.stringify(options)}`);
@@ -218,6 +270,8 @@ ipcMain.on("hxdr-command", (e, options)=>{
                     }
                 });
             }
+            break;
+        default:
             break;
     }
 })
@@ -267,21 +321,25 @@ function about() {
     );
 }
 
-function selectFolder() {
+function selectFolder(assetType, callback) {
+    const AssetType = {
+        OBJ_UPLOAD: { name: 'Wavefront Obj', extensions: ['jpg', 'png', 'mtl', 'obj', 'prj'] },
+        E57_UPLOAD: { name: 'E57', extensions: ['e57', 'prj'] },
+        LAS_UPLOAD: { name: 'LAS', extensions: ['las', 'laz', 'prj'] },
+    }
     const path = dialog.showOpenDialog({
         properties: [
             'openFile',
             'multiSelections',
         ],
         filters: [
-            { name: 'Wavefront Obj', extensions: ['jpg', 'png', 'mtl', 'obj', 'prj'] },
-            { name: 'E57', extensions: ['e57', 'prj'] },
+            ...[AssetType[assetType]],
             { name: 'All Files', extensions: ['*'] }
         ]
     });
     path.then((result)=>{
         if (result.canceled===false) {
-            console.log(JSON.stringify(result, null,2));
+            if (typeof callback==="function") callback(result);
         } else {
             console.log("Cancelled")
         }

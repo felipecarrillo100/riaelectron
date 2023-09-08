@@ -89,46 +89,6 @@ const processCommand = (command: UICommand) =>{
              });
         const bLayer = await LayerFactory.createBingmapsLayer(bModel, {label: "Aerial"});
         map.current?.layerTree.addChild(bLayer);
-
-        const model3D = await ModelFactory.createOgc3DTilesModel({
-            "url": "https://sampledata.luciad.com/data/ogc3dtiles/LucerneAirborneMesh/tileset.json",
-            "credentials": false,
-            "requestHeaders": {},
-            "requestParameters": {},
-        });
-        const layer3D  = await LayerFactory.createOgc3DTilesLayer(model3D, {label: "Point cloud"});
-        map.current?.layerTree.addChild(layer3D);
-
-        const panoModelOptions = {
-            "url": "https://sampledata.luciad.com/data/panoramics/LucernePegasus/cubemap_final.json",
-            "crs": "urn:ogc:def:crs:EPSG::4326",
-            "credentials": false,
-            "requestHeaders": {},
-        }
-        const panoModel = await ModelFactory.createPanoramicsModel(panoModelOptions);
-
-        const panoLayer = await LayerFactory.createPanoramicsLayer(panoModel, {
-            "iconHeightOffset": 2.5,
-            "editable": false,
-            "selectable": false,
-            "label": "/data/panoramics/LucernePegasus",
-            "id": "1ad0d3ca-f77c-4f25-9e31-ee1917aa110d",
-            "parent_id": "83fd6da4-04fb-404f-82ed-ac96af409fc4",
-            "visible": true,
-            "treeNodeType": "LAYER_FEATURE"
-        }, panoModelOptions);
-        map.current?.layerTree.addChild(panoLayer);
-        const queryFinishedHandle = panoLayer.workingSet.on("QueryFinished", () => {
-            if (panoLayer.bounds) {
-                //#snippet layerFit
-                map.current?.mapNavigator.fit({
-                    bounds: panoLayer.bounds,
-                    animate: true
-                });
-                //#endsnippet layerFit
-            }
-            queryFinishedHandle.remove();
-        });
         if (map.current) attachPanoControllerToMap(map.current);
     }
 

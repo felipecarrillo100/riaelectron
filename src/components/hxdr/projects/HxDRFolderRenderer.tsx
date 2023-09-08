@@ -10,7 +10,9 @@ import {HxDRProjectContext} from "../contextprovider/HxDRProjectContext";
 
 
 const availableTypes = [
-    {value: "obj", name: "Wavefront OBJ"}
+    {value: "OBJ_UPLOAD", name: "Wavefront OBJ"},
+    {value: "E57_UPLOAD", name: "E57"},
+    {value: "LAS_UPLOAD", name: "LAS/LAZ"}
 ]
 interface Props {
     folderId: string;
@@ -48,14 +50,14 @@ const HxDRFolderRenderer: React.FC<Props> = (props: Props) => {
 
     const [inputs, setInputs] = useState({
         name: "",
-        type: "obj",
+        type: "OBJ_UPLOAD",
     })
 
     const handleClose = () => {
         setTimeout(()=>{
             setInputs({
                 name: "",
-                type: "obj"
+                type: "OBJ_UPLOAD"
             })
         }, 200);
         setShow(false);
@@ -91,6 +93,7 @@ const HxDRFolderRenderer: React.FC<Props> = (props: Props) => {
                     type: "create-asset",
                     folderName: inputs.name,
                     folderId: props.folderId,
+                    assetType: inputs.type,
                     parentFolder: {name: props.name, id: props.folderId}
                 })
             }
@@ -186,8 +189,8 @@ Folder ID: ${props.folderId}`
                 return <Modal.Title>Confirm Delete Folder</Modal.Title>;
             case "create-asset":
                 return <Modal.Title>Create Asset</Modal.Title>;
-            case "create-asset":
-                return <Modal.Title>Create Asset</Modal.Title>
+            case "create-folder":
+                return <Modal.Title>Create Folder</Modal.Title>
             case "folder-info":
                 return <Modal.Title>Folder Info</Modal.Title>
         }
