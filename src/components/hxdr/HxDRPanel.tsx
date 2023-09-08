@@ -21,7 +21,7 @@ export const HxDRPanel: React.FC = () => {
                console.log(`Refresh Parent Folder: ${options.refresh.parentFolder}`);
                const refreshCommand: HxDRRefreshCommand = {
                    type: "REFRESH",
-                   target:options.refresh.parentFolder
+                   target:options.refresh.parentFolder.id
                }
                emitRefreshCommand(refreshCommand);
             }

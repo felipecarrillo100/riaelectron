@@ -17,7 +17,7 @@ interface Props {
         name: string;
         thumbnailPath: string;
     };
-    parentFolder: string;
+    parentFolder?: {name: string; id: string};
     onItemSelected(properties: LayerInfoHxDR, index?: number): void;
     onItemSelectedDoubleClick?(properties: LayerInfoHxDR, index?: number): void;
     onSetThumbnail?(thumbnail: HxDRPAssetThumbnail): void;

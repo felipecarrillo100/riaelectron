@@ -15,7 +15,8 @@ const availableTypes = [
 interface Props {
     folderId: string;
     name: string;
-    parentFolder: string;
+    disableDelete?: boolean;
+    parentFolder?: {name: string; id: string};
     onItemSelected(properties: LayerInfoHxDR, index?: number): void;
     onItemSelectedDoubleClick?(properties: LayerInfoHxDR, index?: number): void;
     onSetThumbnail?(thumbnail: HxDRPAssetThumbnail): void;
@@ -64,10 +65,17 @@ const HxDRFolderRenderer: React.FC<Props> = (props: Props) => {
         setShow(true);
     }
 
-    const handleCommit = () => {
+    const handleCommit = (event: any) => {
+        event.preventDefault();
+        event.stopPropagation();
         if (project) {
-            if (action === "delete-folder") {
-
+            if (action === "delete-folder" && !props.disableDelete) {
+                electronBridge.ipcRenderer.send("hxdr-command", {
+                    type: "delete-folder-by-folderId",
+                    folderId: props.folderId.trim(),
+                    projectId: project.id.trim(),
+                    parentFolder: props.parentFolder
+                })
             }
             if (action === "create-folder") {
                 electronBridge.ipcRenderer.send("hxdr-command", {
@@ -75,9 +83,16 @@ const HxDRFolderRenderer: React.FC<Props> = (props: Props) => {
                     folderName: inputs.name,
                     folderId: props.folderId,
                     projectId: project.id,
-                    parentFolder: props.folderId
+                    parentFolder: {name: props.name, id: props.folderId}
                 })
-
+            }
+            if (action==="create-asset") {
+                electronBridge.ipcRenderer.send("hxdr-command", {
+                    type: "create-asset",
+                    folderName: inputs.name,
+                    folderId: props.folderId,
+                    parentFolder: {name: props.name, id: props.folderId}
+                })
             }
         }
         handleClose();
@@ -99,23 +114,11 @@ const HxDRFolderRenderer: React.FC<Props> = (props: Props) => {
     const createAsset = () => {
         console.log("Create asset at: " + props.folderId);
         handleShow("create-asset");
-        electronBridge.ipcRenderer.send("hxdr-command", {
-            type: "create-asset",
-            folderName: inputs.name,
-            folderId: props.folderId,
-            parentFolder: props.folderId
-        })
     }
 
     const deleteFolder = () => {
-        if (project) {
-            electronBridge.ipcRenderer.send("hxdr-command", {
-                type: "delete-folder-by-folderId",
-                folderId: props.folderId.trim(),
-                projectId: project.id.trim(),
-                parentFolder: props.parentFolder
-            })
-        }
+        console.log("Delete folder at: " + props.folderId);
+        if (!props.disableDelete) handleShow("delete-folder");
     }
 
     const showFolderInfo = () => {
@@ -180,7 +183,7 @@ Folder ID: ${props.folderId}`
     const returnHeader = (action:ActionTypes) => {
         switch (action) {
             case "delete-folder":
-                return <Modal.Title>Create Folder</Modal.Title>;
+                return <Modal.Title>Confirm Delete Folder</Modal.Title>;
             case "create-asset":
                 return <Modal.Title>Create Asset</Modal.Title>;
             case "create-asset":
@@ -215,15 +218,27 @@ Folder ID: ${props.folderId}`
                 <Modal.Header closeButton>
                     { returnHeader(action) }
                 </Modal.Header>
+                <Form onSubmit={handleCommit}>
                 <Modal.Body>
-                    { project && <Form>
+                    { project && <>
                         <Form.Group className="mb-3" controlId="create-project-name-id">
                             <Form.Label>Project: "<span>{project.name}</span>"</Form.Label>
                         </Form.Group>
-                        <Form.Group className="mb-3" controlId="create-folder-name-id">
-                            <Form.Label>Parent folder: "<span>{props.name}</span>"</Form.Label>
-                        </Form.Group>
-                        {action !== "folder-info" &&
+                        {(action === "delete-folder") ?
+                            <>
+                                <Form.Group className="mb-3" controlId="create-folder-name-id">
+                                    <Form.Label>Folder: "<span>{props.name}</span>"</Form.Label>
+                                </Form.Group>
+                                <Form.Group className="mb-3" controlId="create-folder-name-id">
+                                    <Form.Label>Parent Folder: "<span>{props.parentFolder?.name}</span>"</Form.Label>
+                                </Form.Group>
+                            </>:
+                            <Form.Group className="mb-3" controlId="create-folder-name-id">
+                                <Form.Label>Parent folder: "<span>{props.name}</span>"</Form.Label>
+                            </Form.Group>
+                        }
+
+                        {(action === "create-folder" || action==="create-asset") &&
                             <Form.Group className="mb-3" controlId="create-name-id">
                                 <Form.Label>New {action==="create-folder" ? "folder" : "asset"} name:</Form.Label>
                                 <Form.Control
@@ -233,6 +248,7 @@ Folder ID: ${props.folderId}`
                                     name="name"
                                     value={inputs.name}
                                     onChange={handleChange}
+                                    required={true}
                                 />
                             </Form.Group>
                         }
@@ -247,7 +263,7 @@ Folder ID: ${props.folderId}`
                                 </Form.Control>
                             </Form.Group>
                         }
-                        {action === "folder-info" &&
+                        {(action === "folder-info" ) &&
                             <Form.Group
                                 className="mb-3"
                                 controlId="show-info-id"
@@ -256,16 +272,17 @@ Folder ID: ${props.folderId}`
                                 <Form.Control as="textarea" name="type" value={info} readOnly={true} />
                             </Form.Group>
                         }
-                            </Form>}
+                            </>}
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={handleClose}>
                         Close
                     </Button>
-                    <Button variant="primary" onClick={handleCommit}>
+                    <Button variant="primary" type="submit" >
                         OK
                     </Button>
                 </Modal.Footer>
+                </Form>
             </Modal>
         </>
 
