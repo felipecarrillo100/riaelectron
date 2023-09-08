@@ -7,9 +7,16 @@ export enum AuthState {
     NotAuthenticated = "NotAuthenticated",
 }
 
+export interface HxDRRefreshCommand {
+    type: "REFRESH",
+    target: string;
+}
+
 interface HxDRProjectContextType {
     project: HxDRProjectItem | null;
     setProject: (valu:HxDRProjectItem | null)=>void;
+    refreshCommand: HxDRRefreshCommand | null;
+    emitRefreshCommand: (valu:HxDRRefreshCommand | null)=>void;
 };
 
 export const HxDRProjectContext = createContext<HxDRProjectContextType>({} as any);

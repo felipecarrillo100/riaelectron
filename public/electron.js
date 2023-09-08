@@ -173,12 +173,15 @@ ipcMain.on("hxdr-command", (e, options)=>{
     switch (options.type) {
         case "delete-asset-by-assetId":
             if (hxDrAsseUploadManager) {
-                console.log(`Deleting asset ${options.assetId}`);
+                console.log(`Deleting asset ${JSON.stringify(options)}`);
                 hxDrAsseUploadManager.deleteAsset(options.assetId).then(result=>{
                     console.log(JSON.stringify(result));
                     if (result.success) {
                         mainWindow.webContents.send("hxdr-feedback", {
-                            success: true
+                            success: true,
+                            refresh: {
+                                parentFolder: options.parentFolder
+                            }
                         })
                     }{}
                 });
@@ -186,12 +189,31 @@ ipcMain.on("hxdr-command", (e, options)=>{
             break;
         case "delete-folder-by-folderId":
             if (hxDrAsseUploadManager) {
-                console.log(`Deleting folder ${options.folderId} from ${options.projectId}`);
+                console.log(`Deleting folder ${JSON.stringify(options)}`);
                 hxDrAsseUploadManager.deleteFolder(options.folderId, options.projectId).then(result=>{
                     console.log(JSON.stringify(result));
                     if (result.success) {
                         mainWindow.webContents.send("hxdr-feedback", {
-                            success: true
+                            success: true,
+                            refresh: {
+                                parentFolder: options.parentFolder
+                            }
+                        })
+                    }
+                });
+            }
+            break;
+        case "create-folder":
+            if (hxDrAsseUploadManager) {
+                console.log(`Create folder ${JSON.stringify(options)}`);
+                hxDrAsseUploadManager.createFolder(options.folderName, options.folderId, options.projectId).then(result=>{
+                    console.log(JSON.stringify(result));
+                    if (result.success) {
+                        mainWindow.webContents.send("hxdr-feedback", {
+                            success: true,
+                            refresh: {
+                                parentFolder: options.parentFolder
+                            }
                         })
                     }
                 });

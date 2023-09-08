@@ -1,4 +1,4 @@
-import React, {useContext, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {HxDRPAssetThumbnail} from "./HxDRProjectFoldersContainer";
 import {HxDRFolderContentsRenderer} from "./HxDRFolderContentsRenderer";
@@ -15,6 +15,7 @@ const availableTypes = [
 interface Props {
     folderId: string;
     name: string;
+    parentFolder: string;
     onItemSelected(properties: LayerInfoHxDR, index?: number): void;
     onItemSelectedDoubleClick?(properties: LayerInfoHxDR, index?: number): void;
     onSetThumbnail?(thumbnail: HxDRPAssetThumbnail): void;
@@ -24,7 +25,22 @@ interface Props {
 type ActionTypes = "create-folder" | "create-asset" | "folder-info" | "delete-folder";
 
 const HxDRFolderRenderer: React.FC<Props> = (props: Props) => {
-    const {project} = useContext(HxDRProjectContext);
+    const {project, refreshCommand} = useContext(HxDRProjectContext);
+
+    useEffect(()=>{
+        if (refreshCommand) {
+            if (refreshCommand.type==="REFRESH") {
+                if (refreshCommand.target === props.folderId) {
+                    if (expanded) {
+                        setExpanded(false);
+                        setTimeout(()=>{
+                            setExpanded(true);
+                        },1)
+                    }
+                }
+            }
+        }
+    }, [refreshCommand])
 
     const [show, setShow] = useState(false);
     const [action, setAction] = useState("create-asset" as ActionTypes);
@@ -49,10 +65,22 @@ const HxDRFolderRenderer: React.FC<Props> = (props: Props) => {
     }
 
     const handleCommit = () => {
-        handleClose();
-        if (action === "delete-folder") {
+        if (project) {
+            if (action === "delete-folder") {
 
+            }
+            if (action === "create-folder") {
+                electronBridge.ipcRenderer.send("hxdr-command", {
+                    type: "create-folder",
+                    folderName: inputs.name,
+                    folderId: props.folderId,
+                    projectId: project.id,
+                    parentFolder: props.folderId
+                })
+
+            }
         }
+        handleClose();
     }
 
     const [expanded, setExpanded] = useState(false);
@@ -66,11 +94,6 @@ const HxDRFolderRenderer: React.FC<Props> = (props: Props) => {
     const createFolder = () => {
         console.log("Create folder at: " + props.folderId);
         handleShow("create-folder");
-        electronBridge.ipcRenderer.send("hxdr-command", {
-            type: "create-folder",
-            folderName: props.name,
-            folderId: props.folderId,
-        })
     }
 
     const createAsset = () => {
@@ -78,8 +101,9 @@ const HxDRFolderRenderer: React.FC<Props> = (props: Props) => {
         handleShow("create-asset");
         electronBridge.ipcRenderer.send("hxdr-command", {
             type: "create-asset",
-            folderName: props.name,
+            folderName: inputs.name,
             folderId: props.folderId,
+            parentFolder: props.folderId
         })
     }
 
@@ -88,7 +112,8 @@ const HxDRFolderRenderer: React.FC<Props> = (props: Props) => {
             electronBridge.ipcRenderer.send("hxdr-command", {
                 type: "delete-folder-by-folderId",
                 folderId: props.folderId.trim(),
-                projectId: project.id.trim()
+                projectId: project.id.trim(),
+                parentFolder: props.parentFolder
             })
         }
     }

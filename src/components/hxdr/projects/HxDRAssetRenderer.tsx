@@ -17,6 +17,7 @@ interface Props {
         name: string;
         thumbnailPath: string;
     };
+    parentFolder: string;
     onItemSelected(properties: LayerInfoHxDR, index?: number): void;
     onItemSelectedDoubleClick?(properties: LayerInfoHxDR, index?: number): void;
     onSetThumbnail?(thumbnail: HxDRPAssetThumbnail): void;
@@ -121,6 +122,7 @@ const HxDRAssetRenderer: React.FC<Props> = (props: Props) => {
             electronBridge.ipcRenderer.send("hxdr-command", {
                 type: "delete-asset-by-assetId",
                 assetId: props.asset.id,
+                parentFolder: props.parentFolder
             })
         }
     }

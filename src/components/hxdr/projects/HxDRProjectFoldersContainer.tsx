@@ -31,6 +31,7 @@ const HxDRProjectFoldersContainer: React.FC<Props> = (props: Props) => {
             <ScrollableDiv scrollheight={280} className="main-container">
                 <ul>
                     <HxDRFolderRenderer folderId={props.project.rootFolder.id} name="root"
+                                        parentFolder=""
                                         onItemSelected={props.onItemSelected}
                                         onItemSelectedDoubleClick={props.onItemSelectedDoubleClick}
                                         onSetThumbnail={props.onSetThumbnail}

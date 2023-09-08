@@ -1,17 +1,33 @@
-import React, {useContext, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import "./projects/styles.scss"
 import "./HxDRPanel.scss"
 import HxDRProjectsLIst, {HxDRProjectItem} from "./projects/HxDRProjectsLIst";
 import {HxDRProjectFoldersContainer} from "./projects/HxDRProjectFoldersContainer";
 import {CreateHxDRLayerCommand, LayerInfoHxDR} from "./utils/CreateHxDRLayerCommand";
 import {ApplicationContext} from "../../contextprovider/ApplicationContext";
-import {HxDRProjectContext} from "./contextprovider/HxDRProjectContext";
+import {HxDRProjectContext, HxDRRefreshCommand} from "./contextprovider/HxDRProjectContext";
+import {electronBridge} from "../../electronbridge/Bridge";
 
 export const HxDRPanel: React.FC = () => {
     const {sendCommand} = useContext(ApplicationContext);
 
+    const [refreshCommand, emitRefreshCommand] = useState(null as HxDRRefreshCommand | null);
     const [project, setProject] = useState(null as HxDRProjectItem | null);
     const [currentLayer, setCurrentLayer] = useState(null as LayerInfoHxDR | null);
+
+    useEffect(()=>{
+        electronBridge.ipcRenderer.on("hxdr-feedback", (options)=>{
+            if (options.refresh) {
+               console.log(`Refresh Parent Folder: ${options.refresh.parentFolder}`);
+               const refreshCommand: HxDRRefreshCommand = {
+                   type: "REFRESH",
+                   target:options.refresh.parentFolder
+               }
+               emitRefreshCommand(refreshCommand);
+            }
+        });
+        return ()=>{}
+    }, [])
 
     const onItemSelected = (layer: LayerInfoHxDR, index?: number) => {
         setCurrentLayer(layer);
@@ -33,7 +49,7 @@ export const HxDRPanel: React.FC = () => {
         }
     }
     return (
-        <HxDRProjectContext.Provider value={{project, setProject}}>
+        <HxDRProjectContext.Provider value={{project, setProject, refreshCommand, emitRefreshCommand}}>
             <div className="HxDRProjectsTab">
                 <HxDRProjectsLIst project={project as any} setProject={setProject}/>
                 <HxDRProjectFoldersContainer

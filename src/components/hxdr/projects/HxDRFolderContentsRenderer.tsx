@@ -292,13 +292,14 @@ const HxDRFolderContentsRenderer: React.FC<Props> = (props: Props) => {
                 {!queryFolderContents.loading ?
                     <ul>
                         {folders.map((folder: any)=>(<HxDRFolderRenderer key={folder.id} folderId={folder.id} name={folder.name}
+                                                                         parentFolder={props.folderId}
                                                                          onItemSelected={props.onItemSelected}
                                                                          onItemSelectedDoubleClick={props.onItemSelectedDoubleClick}
                                                                          onSetThumbnail={props.onSetThumbnail}
-                                                                         currentLayer={props.currentLayer}
-                        />))}
+                                                                         currentLayer={props.currentLayer}></HxDRFolderRenderer>))}
                         {assets.map((asset: any)=>(<HxDRAssetRenderer key={asset.id}
                                                                       asset={asset}
+                                                                      parentFolder={props.folderId}
                                                                       onItemSelected={props.onItemSelected}
                                                                       onItemSelectedDoubleClick={props.onItemSelectedDoubleClick}
                                                                       onSetThumbnail={props.onSetThumbnail}
