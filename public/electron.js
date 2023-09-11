@@ -37,6 +37,7 @@ let hxDrAsseUploadManager = null;
 database.init(sqlpath).then(db=>{
     const hxDrAsseUpload= new HxDRAssetUpload({db});
     hxDrAsseUploadManager = hxDrAsseUpload;
+    hxDrAsseUploadManager.start();
 });
 
 
@@ -240,8 +241,9 @@ ipcMain.on("hxdr-command", (e, options)=>{
                     assetType: options.assetType,
                     status:  HxDRUploadStatusEnum.NEW
                 })
-                selectFolder(options.assetType, ()=>{
-                    hxDrAsseUploadManager.addNewTask(task, files).then(result=>{
+                selectFolder(options.assetType, (folderSelect)=>{
+                    if (folderSelect.canceled) return;
+                    hxDrAsseUploadManager.addNewTask(task, folderSelect.filePaths).then(result=>{
                         console.log(JSON.stringify(result));
                         if (result.success) {
                             mainWindow.webContents.send("hxdr-feedback", {

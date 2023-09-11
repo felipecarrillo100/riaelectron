@@ -21,7 +21,6 @@ const ValidCategories = [
 
 let isValidLayerType = (address:any)=>(address.serviceType === "HSPC" || address.serviceType === "OGC_3D_TILES" || address.serviceType==="CUBEMAP_JSON");
 
-
 interface Props {
     asset: {
         id: string;
@@ -32,7 +31,6 @@ interface Props {
     onItemSelectedDoubleClick?(properties: LayerInfoHxDR, index?: number): void;
     currentLayer: LayerInfoHxDR | null;
 }
-
 
 const HxDRAssetContentsRenderer: React.FC<Props> = (props: Props) => {
     const queryAsset = useQuery(HxDRGetAssetDetailsNew, {
@@ -100,6 +98,12 @@ const HxDRAssetContentsRenderer: React.FC<Props> = (props: Props) => {
         }
     }
 
+
+    const validProcess = (row: any) => {
+        const address = row.addresses.find((i:any)=>i.consumptionType!=="DOWNLOADABLE");
+        return address.processingPipelineInfo.status !== "FAILED";
+    }
+
     return (
         <>
             { !queryAsset.loading ?
@@ -122,6 +126,9 @@ const HxDRAssetContentsRenderer: React.FC<Props> = (props: Props) => {
                                         <FontAwesomeIcon className="FontAwesomeIcon-class" icon="external-link-alt" />
                                     </span>
                                     {row.type}
+                                    {!validProcess(row) && <span className="icon-wrapper" title="Process failed">
+                                        <FontAwesomeIcon className="FontAwesomeIcon-class" icon="warning" />
+                                    </span>}
                                 </div>
                             </li>)
                     }

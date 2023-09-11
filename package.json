@@ -23,7 +23,7 @@
     "cross-env": "^7.0.3",
     "cross-fetch": "^4.0.0",
     "http": "^0.0.1-security",
-    "hxdrassetupload": "^0.0.2",
+    "hxdrassetupload": "^0.0.3",
     "ndbsqlite": "^0.0.7",
     "node-static": "^0.7.11",
     "react": "^18.2.0",

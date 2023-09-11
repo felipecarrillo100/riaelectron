@@ -16,6 +16,7 @@ interface Props {
         id: string;
         name: string;
         thumbnailPath: string;
+        assetStatus: string;
     };
     parentFolder?: {name: string; id: string};
     onItemSelected(properties: LayerInfoHxDR, index?: number): void;
@@ -137,6 +138,10 @@ const HxDRAssetRenderer: React.FC<Props> = (props: Props) => {
                 {!expanded && <FontAwesomeIcon className="FontAwesomeIcon-class" icon="file-alt" />}
             </span>
                 <span>{props.asset.name}</span>
+                { props.asset.assetStatus !== 'ASSET_COMPLETE' && <span className="icon-wrapper" title="Asset incomplete">
+                    <FontAwesomeIcon className="FontAwesomeIcon-class" icon="warning" />
+                </span>
+                }
             </div>
             {
                 expanded ?
