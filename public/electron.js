@@ -177,13 +177,31 @@ ipcMain.on("db-query", (e, options)=>{
     const repositories = hxDrAsseUploadManager.getRepositories();
     if (!repositories) return;
     switch (options.type) {
+        case "deleteItem":
+            if (typeof repositories[options.repository] !== "undefined") {
+                repositories[options.repository].delete(options.id).then(values=>{
+                    console.log(JSON.stringify(values));
+                    mainWindow.webContents.send("db-feedback", {
+                        success: true,
+                        values,
+                        refresh: {
+                            type: options.type,
+                            repository: options.repository,
+                            id: options.id
+                        }
+                    })
+                })
+            }
+                break;
         case "queryLike":
             if (typeof repositories[options.repository] !== "undefined") {
                 repositories[options.repository].queryLike(options.query).then(values=>{
                     console.log(JSON.stringify(values));
                     mainWindow.webContents.send("db-feedback", {
                         success: true,
+                        values,
                         refresh: {
+                            type: options.type,
                             repository: options.repository,
                             query: options.query
                         }
@@ -235,7 +253,7 @@ ipcMain.on("hxdr-command", (e, options)=>{
                 const files =[];
                 console.log(`Create asset ${JSON.stringify(options)}`);
                 const task = new HxDRAssetUploadTask({
-                    assetName: options.folderName,
+                    assetName: options.assetName,
                     assetId: "",
                     parentFolderId: options.folderId,
                     assetType: options.assetType,

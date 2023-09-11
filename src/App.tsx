@@ -10,6 +10,7 @@ import {setHxDRAccessToken} from "./components/hxdr/tokens/HxDRTokens";
 import {UICommand} from "./interfaces/UICommand";
 import CustomContextMenu from "react-class-contexify";
 import {Tab, Tabs} from "react-bootstrap";
+import {TaskList} from "./components/tasks/TaskList";
 
 const client = createNewApolloClient();
 
@@ -80,7 +81,7 @@ function App() {
                             </div>
                         </Tab>
                         <Tab eventKey="profile" title="Uploads">
-                            Asset uploads will be here
+                            <TaskList />
                         </Tab>
                         <Tab eventKey="contact" title="Jobs">
                             Processing jobs will be added here

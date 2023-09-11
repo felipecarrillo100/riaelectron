@@ -91,7 +91,7 @@ const HxDRFolderRenderer: React.FC<Props> = (props: Props) => {
             if (action==="create-asset") {
                 electronBridge.ipcRenderer.send("hxdr-command", {
                     type: "create-asset",
-                    folderName: inputs.name,
+                    assetName: inputs.name,
                     folderId: props.folderId,
                     assetType: inputs.type,
                     parentFolder: {name: props.name, id: props.folderId}
