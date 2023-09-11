@@ -99,9 +99,13 @@ const HxDRAssetContentsRenderer: React.FC<Props> = (props: Props) => {
     }
 
 
-    const validProcess = (row: any) => {
+    const getAssetStatus = (row: any) => {
         const address = row.addresses.find((i:any)=>i.consumptionType!=="DOWNLOADABLE");
-        return address.processingPipelineInfo.status !== "FAILED";
+        if (!address) {
+            return "FAILED";
+        }
+        console.log("Status: " + address.processingPipelineInfo.status);
+        return address.processingPipelineInfo.status;
     }
 
     return (
@@ -110,6 +114,7 @@ const HxDRAssetContentsRenderer: React.FC<Props> = (props: Props) => {
                 <ul>
                     {rows.map((row:any)=>{
                             let active = "";
+                            const assetStatus = getAssetStatus(row);
                             if (props.currentLayer) {
                                 const mode = endpointType(row.addresses);
                                 if (
@@ -126,7 +131,13 @@ const HxDRAssetContentsRenderer: React.FC<Props> = (props: Props) => {
                                         <FontAwesomeIcon className="FontAwesomeIcon-class" icon="external-link-alt" />
                                     </span>
                                     {row.type}
-                                    {!validProcess(row) && <span className="icon-wrapper" title="Process failed">
+                                    {assetStatus==="RUNNING" && <span className="icon-wrapper" title="Process Running">
+                                        <FontAwesomeIcon className="FontAwesomeIcon-class spin-icon" icon="spinner" />
+                                    </span>}
+                                    {assetStatus==="FAILED" && <span className="icon-wrapper" title="Process failed">
+                                        <FontAwesomeIcon className="FontAwesomeIcon-class" icon="warning" />
+                                    </span>}
+                                    {assetStatus==="CREATED" && <span className="icon-wrapper" title="Process created">
                                         <FontAwesomeIcon className="FontAwesomeIcon-class" icon="warning" />
                                     </span>}
                                 </div>
