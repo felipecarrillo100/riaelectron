@@ -73,7 +73,7 @@ export const TaskList: React.FC = () => {
     let renderItems = [];
     if (queryResult) {
         renderItems = queryResult.items.map((e:any)=>(
-            <tr>
+            <tr key={e._id}>
                 <td>{e._id}</td>
                 <td><a href="#">{e._assetName}</a></td>
                 <td>{e._assetId}</td>
